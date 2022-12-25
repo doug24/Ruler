@@ -1,0 +1,78 @@
+﻿<Window x:Class="Ruler.SizeToolsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ruler"
+        mc:Ignorable="d"
+        Title="Ruler Layout" 
+        FontSize="14"
+        Height="240" Width="480"
+        WindowStyle="ToolWindow">
+
+    <Window.Resources>
+        <local:EnumBooleanConverter x:Key="enumBool"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Margin="3,3,3,0" Header="Orientation">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Horizontal" Margin="3" GroupName="Style"
+                         IsChecked="{Binding RulerStyle, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Horizontal}"/>
+                <RadioButton Content="Vertical" Margin="3" GroupName="Style"
+                         IsChecked="{Binding RulerStyle, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Vertical}"/>
+            </StackPanel>
+        </GroupBox>
+
+        <UniformGrid Grid.Row="1" Rows="1">
+            <GroupBox DockPanel.Dock="Left" Margin="3,0" Header="Zero Point">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Near" Margin="3" GroupName="Zero"
+                                 IsChecked="{Binding ZeroPoint, 
+                                    Converter={StaticResource enumBool}, ConverterParameter=Near}"/>
+                    <RadioButton Content="Far" Margin="3" GroupName="Zero"
+                                 IsChecked="{Binding ZeroPoint, 
+                                    Converter={StaticResource enumBool}, ConverterParameter=Far}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Margin="3,0" Header="Scale">
+                <CheckBox Content="Flip" Margin="3"
+                          IsChecked="{Binding Flip}"/>
+            </GroupBox>
+        </UniformGrid>
+
+        <GroupBox Grid.Row="2" Margin="3,0" Header="Units">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Pixel" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Pixel, Mode=TwoWay}"/>
+                <RadioButton Content="DIP" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=DIP, Mode=TwoWay}"/>
+                <RadioButton Content="Point" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Point, Mode=TwoWay}"/>
+                <RadioButton Content="Inch" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Inch, Mode=TwoWay}"/>
+                <RadioButton Content="Centimeter" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=CM, Mode=TwoWay}"/>
+                <RadioButton Content="Percent" Margin="3" GroupName="Unit"
+                         IsChecked="{Binding ScaleUnits, 
+                            Converter={StaticResource enumBool}, ConverterParameter=Percent, Mode=TwoWay}"/>
+            </StackPanel>
+        </GroupBox>
+
+    </Grid>
+</Window>
