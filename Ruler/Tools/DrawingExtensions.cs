@@ -76,7 +76,7 @@ namespace Ruler
             double x = center.X + (radius * Math.Cos(angle / 180 * Math.PI));
             double y = center.Y + (radius * Math.Sin(angle / 180 * Math.PI));
 
-            return new Point(Math.Round(x, 2), Math.Round(y, 2));
+            return new Point(x, y);
         }
 
         /// <summary>

@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Ruler
 {
-    public enum Quadrant
-    {
-        TopRight,
-        TopLeft,
-        BottomLeft,
-        BottomRight,
-    }
-
-    public class Angle : Control
+    public class Angle : Measure
     {
         static Angle()
         {
@@ -42,35 +32,6 @@ namespace Ruler
             DependencyProperty.Register("MousePoint", typeof(Point), typeof(Angle),
             new FrameworkPropertyMetadata(new Point(), FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public RulerStyle RulerStyle
-        {
-            get { return (RulerStyle)GetValue(RulerStyleProperty); }
-            set { SetValue(RulerStyleProperty, value); }
-        }
-
-        public static readonly DependencyProperty RulerStyleProperty =
-            DependencyProperty.Register("RulerStyle", typeof(RulerStyle), typeof(Angle),
-            new FrameworkPropertyMetadata(RulerStyle.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender));
-
-        public Units ScaleUnits
-        {
-            get { return (Units)GetValue(ScaleUnitsProperty); }
-            set { SetValue(ScaleUnitsProperty, value); }
-        }
-
-        public static readonly DependencyProperty ScaleUnitsProperty =
-            DependencyProperty.Register("ScaleUnits", typeof(Units), typeof(Angle),
-            new FrameworkPropertyMetadata(Units.DIP, FrameworkPropertyMetadataOptions.AffectsRender));
-
-        public ZeroPoint ZeroPoint
-        {
-            get { return (ZeroPoint)GetValue(ZeroPointProperty); }
-            set { SetValue(ZeroPointProperty, value); }
-        }
-
-        public static readonly DependencyProperty ZeroPointProperty =
-            DependencyProperty.Register("ZeroPoint", typeof(ZeroPoint), typeof(Angle),
-            new FrameworkPropertyMetadata(ZeroPoint.Near, FrameworkPropertyMetadataOptions.AffectsRender));
 
         protected override void OnRender(DrawingContext dc)
         {
@@ -238,19 +199,6 @@ namespace Ruler
             textOrigin = DrawingExtensions.GetEndPointOnRadus(Origin, radius + 12,
                 startDegrees, sweepDegrees / 2, sweepDirection);
             textOrigin.Offset(textOffset ? -label.Width : 0, -label.Height / 2);
-        }
-
-        private Typeface Typeface => new(FontFamily, FontStyle, FontWeight, FontStretch);
-
-        private FormattedText FormatText(string text, Brush foreground)
-        {
-            return new(text,
-                CultureInfo.CurrentCulture,
-                FlowDirection,
-                Typeface,
-                FontSize,
-                foreground,
-                VisualTreeHelper.GetDpi(this).PixelsPerDip);
         }
     }
 }
