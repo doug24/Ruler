@@ -8,7 +8,7 @@
         x:Name="mainWindow"
         Title="Ruler"
         WindowStyle="None"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         AllowsTransparency="True"
         Background="Transparent"
         Width="{Binding Width, Mode=TwoWay}"
@@ -27,6 +27,7 @@
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Layout" Click="ShowLayoutDialog_Click"/>
+                <MenuItem Header="Angle" Click="ShowAngle_Click"/>
             </ContextMenu>
         </Grid.ContextMenu>
 

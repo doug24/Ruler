@@ -17,6 +17,7 @@ namespace Ruler
         private readonly RulerViewModel viewModel = new();
         private readonly DispatcherTimer dispatcherTimer;
         private SizeToolsWindow? dlg;
+        private OverlayWindow? overlay;
 
         public MainWindow()
         {
@@ -24,19 +25,40 @@ namespace Ruler
 
             DataContext = viewModel;
 
+            Top = 400;
+            Left = 200;
+
             dispatcherTimer = new(TimeSpan.FromMilliseconds(50),
                 DispatcherPriority.Render, TimerCallback, Dispatcher);
 
             StateChanged += (s, e) => WindowState = WindowState.Normal;
             Loaded += (s, e) => dispatcherTimer.Start();
-            LocationChanged += (s, e) => InvalidateVisual();
             SizeChanged += (s, e) => InvalidateVisual();
+            LocationChanged += MainWindow_LocationChanged;
 
             SourceInitialized += MainWindow_SourceInitialized;
             PreviewKeyDown += MainWindow_PreviewKeyDown;
 
             ruler.MouseDown += MainWindow_MouseDown;
             ruler.PreviewMouseDown += Ruler_PreviewMouseDown;
+
+            viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(viewModel.Flip) ||
+                e.PropertyName == nameof(viewModel.ZeroPoint) ||
+                e.PropertyName == nameof(viewModel.RulerStyle))
+            {
+                UpdateOrigin();
+            }
+        }
+
+        private void MainWindow_LocationChanged(object? sender, EventArgs e)
+        {
+            UpdateOrigin();
+            InvalidateVisual();
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -62,15 +84,30 @@ namespace Ruler
                 Top += ctrl ? 5 : 0.5;
                 e.Handled = true;
             }
+            else if (e.Key == Key.A)
+            {
+                if (overlay != null && overlay.Visibility == Visibility.Visible)
+                {
+                    overlay.Close();
+                }
+                else
+                {
+                    ShowAngle_Click(this, new());
+                }
+            }
             else if (e.Key == Key.Escape)
             {
                 Close();
                 e.Handled = true;
             }
         }
-
         private void TimerCallback(object? sender, EventArgs e)
         {
+            if (overlay != null)
+            {
+                viewModel.MousePoint = MouseTracker.GetMousePosition(overlay);
+            }
+
             var newPosition = MouseTracker.GetTrackPoint(this, viewModel.RulerStyle, viewModel.ActiveEdge);
             if (newPosition != viewModel.TrackPoint)
             {
@@ -118,6 +155,7 @@ namespace Ruler
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            overlay?.Close();
             dlg?.Close();
             base.OnClosing(e);
         }
@@ -140,6 +178,47 @@ namespace Ruler
                 dlg.Closing += (s, e) => dlg = null;
             }
             dlg.Show();
+        }
+
+        private void ShowAngle_Click(object sender, RoutedEventArgs e)
+        {
+            if (overlay == null)
+            {
+                overlay = new(viewModel)
+                {
+                    Owner = this,
+                    WindowStartupLocation = WindowStartupLocation.Manual
+                };
+                overlay.Closing += (s, e) => overlay = null;
+            }
+
+            UpdateOrigin();
+
+            Screen screen = Screen.FromWindow(this);
+            overlay.Left = 0;
+            overlay.Top = 0;
+            overlay.Width = screen.WorkingAreaDip.Width;
+            overlay.Height = screen.WorkingAreaDip.Height;
+            overlay.Show();
+
+        }
+
+        private void UpdateOrigin()
+        {
+            double x, y;
+
+            if (viewModel.RulerStyle == RulerStyle.Horizontal)
+            {
+                x = viewModel.ZeroPoint == ZeroPoint.Near ? Left : Left + Width;
+                y = viewModel.Flip ? Top + Height : Top;
+            }
+            else
+            {
+                x = viewModel.Flip ? Left : Left + Width;
+                y = viewModel.ZeroPoint == ZeroPoint.Far ? Top + Height : Top;
+            }
+
+            viewModel.Origin = new(x, y);
         }
 
     }

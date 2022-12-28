@@ -11,6 +11,12 @@ namespace Ruler
         }
 
         [ObservableProperty]
+        private Point origin = new();
+
+        [ObservableProperty]
+        private Point mousePoint = new();
+
+        [ObservableProperty]
         private Point trackPoint = new();
 
         [ObservableProperty]

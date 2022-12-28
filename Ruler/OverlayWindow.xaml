@@ -1,0 +1,24 @@
+﻿<Window x:Class="Ruler.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ruler"
+        mc:Ignorable="d"
+        Title="" 
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent"
+        d:DesignWidth="80"
+        d:DesignHeight="80">
+
+    <local:Angle Foreground="#FFFF6600"
+                 FontSize="14"
+                 Origin="{Binding Origin}"
+                 MousePoint="{Binding MousePoint}"
+                 RulerStyle="{Binding RulerStyle}"
+                 ScaleUnits="{Binding ScaleUnits}" 
+                 ZeroPoint="{Binding ZeroPoint}"/>
+</Window>
