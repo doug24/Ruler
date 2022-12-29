@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Ruler
@@ -20,7 +21,7 @@ namespace Ruler
         private Point trackPoint = new();
 
         [ObservableProperty]
-        private RulerStyle rulerStyle = RulerStyle.Horizontal;
+        private Orientation orientation = Orientation.Horizontal;
 
         [ObservableProperty]
         private Thickness resizeBorder = new(4, 0, 4, 0);
@@ -60,16 +61,16 @@ namespace Ruler
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(RulerStyle))
+            if (e.PropertyName == nameof(Orientation))
             {
-                if (RulerStyle == RulerStyle.Horizontal)
+                if (Orientation == Orientation.Horizontal)
                 {
                     ResizeBorder = new Thickness(4, 0, 4, 0);
                     ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
                     Width = LongAxis;
                     Height = ShortAxis;
                 }
-                else if (RulerStyle == RulerStyle.Vertical)
+                else if (Orientation == Orientation.Vertical)
                 {
                     ResizeBorder = new Thickness(0, 4, 0, 4);
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
@@ -79,33 +80,33 @@ namespace Ruler
             }
             else if (e.PropertyName == nameof(Flip))
             {
-                if (RulerStyle == RulerStyle.Horizontal)
+                if (Orientation == Orientation.Horizontal)
                 {
                     ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
                 }
-                else if (RulerStyle == RulerStyle.Vertical)
+                else if (Orientation == Orientation.Vertical)
                 {
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
                 }
             }
             else if (e.PropertyName == nameof(Width))
             {
-                if (RulerStyle == RulerStyle.Horizontal)
+                if (Orientation == Orientation.Horizontal)
                 {
                     LongAxis = Width;
                 }
-                else if (RulerStyle == RulerStyle.Vertical)
+                else if (Orientation == Orientation.Vertical)
                 {
                     ShortAxis = Width;
                 }
             }
             else if (e.PropertyName == nameof(Height))
             {
-                if (RulerStyle == RulerStyle.Horizontal)
+                if (Orientation == Orientation.Horizontal)
                 {
                     ShortAxis = Height;
                 }
-                else if (RulerStyle == RulerStyle.Vertical)
+                else if (Orientation == Orientation.Vertical)
                 {
                     LongAxis = Height;
                 }

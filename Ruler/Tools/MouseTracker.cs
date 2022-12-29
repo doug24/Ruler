@@ -1,10 +1,11 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Ruler
 {
     public static class MouseTracker
     {
-        public static Point GetTrackPoint(Window window, RulerStyle style, Edge edge)
+        public static Point GetTrackPoint(Window window, Orientation orientation, Edge edge)
         {
             var screenPoint = GetMousePosition(window);
             var clientPoint = new Point(screenPoint.X - window.Left, screenPoint.Y - window.Top);
@@ -12,7 +13,7 @@ namespace Ruler
             Rect rect = new(new Point(window.Left, window.Top), new Size(window.ActualWidth, window.ActualHeight));
 
             double x = 0, y = 0;
-            if (style == RulerStyle.Horizontal)
+            if (orientation == Orientation.Horizontal)
             {
                 x = ToScaleX(screenPoint, clientPoint, rect);
 
@@ -27,7 +28,7 @@ namespace Ruler
                 }
 
             }
-            else if (style == RulerStyle.Vertical)
+            else if (orientation == Orientation.Vertical)
             {
                 y = ToScaleY(screenPoint, clientPoint, rect);
 

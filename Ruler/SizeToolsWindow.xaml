@@ -26,10 +26,10 @@
         <GroupBox Grid.Row="0" Margin="3,3,3,0" Header="Orientation">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Horizontal" Margin="3" GroupName="Style"
-                         IsChecked="{Binding RulerStyle, 
+                         IsChecked="{Binding Orientation, 
                             Converter={StaticResource enumBool}, ConverterParameter=Horizontal}"/>
                 <RadioButton Content="Vertical" Margin="3" GroupName="Style"
-                         IsChecked="{Binding RulerStyle, 
+                         IsChecked="{Binding Orientation, 
                             Converter={StaticResource enumBool}, ConverterParameter=Vertical}"/>
             </StackPanel>
         </GroupBox>

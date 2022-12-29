@@ -7,12 +7,6 @@ using System.Windows.Media;
 
 namespace Ruler
 {
-    public enum RulerStyle
-    {
-        Horizontal,
-        Vertical,
-    }
-
     public enum ZeroPoint
     {
         Near,
@@ -111,15 +105,15 @@ namespace Ruler
             return listOfInts.ToArray();
         }
 
-        public RulerStyle RulerStyle
+        public Orientation Orientation
         {
-            get { return (RulerStyle)GetValue(RulerStyleProperty); }
-            set { SetValue(RulerStyleProperty, value); }
+            get { return (Orientation)GetValue(OrientationProperty); }
+            set { SetValue(OrientationProperty, value); }
         }
 
-        public static readonly DependencyProperty RulerStyleProperty =
-            DependencyProperty.Register("RulerStyle", typeof(RulerStyle), typeof(Measure),
-            new FrameworkPropertyMetadata(RulerStyle.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender));
+        public static readonly DependencyProperty OrientationProperty =
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(Measure),
+            new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public Units ScaleUnits
         {

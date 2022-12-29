@@ -32,11 +32,11 @@ namespace Ruler
 
             RenderBackground(drawingContext, blackPen);
 
-            if (RulerStyle == RulerStyle.Horizontal)
+            if (Orientation == Orientation.Horizontal)
             {
                 RenderHorizontalScale(drawingContext, blackPen);
             }
-            else if (RulerStyle == RulerStyle.Vertical)
+            else
             {
                 RenderVerticalScale(drawingContext, blackPen);
             }

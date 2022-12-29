@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
@@ -50,7 +51,7 @@ namespace Ruler
         {
             if (e.PropertyName == nameof(viewModel.Flip) ||
                 e.PropertyName == nameof(viewModel.ZeroPoint) ||
-                e.PropertyName == nameof(viewModel.RulerStyle))
+                e.PropertyName == nameof(viewModel.Orientation))
             {
                 UpdateOrigin();
             }
@@ -124,7 +125,7 @@ namespace Ruler
 
             magnifierWindow?.MoveTo(MouseTracker.GetMousePosition(this));
 
-            var newPosition = MouseTracker.GetTrackPoint(this, viewModel.RulerStyle, viewModel.ActiveEdge);
+            var newPosition = MouseTracker.GetTrackPoint(this, viewModel.Orientation, viewModel.ActiveEdge);
             if (newPosition != viewModel.TrackPoint)
             {
                 viewModel.TrackPoint = newPosition;
@@ -231,7 +232,7 @@ namespace Ruler
         {
             double x, y;
 
-            if (viewModel.RulerStyle == RulerStyle.Horizontal)
+            if (viewModel.Orientation == Orientation.Horizontal)
             {
                 x = viewModel.ZeroPoint == ZeroPoint.Near ? Left : Left + Width;
                 y = viewModel.Flip ? Top + Height : Top;

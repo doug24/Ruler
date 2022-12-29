@@ -41,7 +41,7 @@
         <local:Scale x:Name="ruler"
                      Foreground="Black"
                      FontSize="12"
-                     RulerStyle="{Binding RulerStyle}"
+                     Orientation="{Binding Orientation}"
                      ScaleUnits="{Binding ScaleUnits}"
                      ZeroPoint="{Binding ZeroPoint}"
                      Flip="{Binding Flip}"

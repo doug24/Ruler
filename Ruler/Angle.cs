@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Ruler
@@ -75,7 +76,7 @@ namespace Ruler
 
             bool textOffset = false;
 
-            if (RulerStyle == RulerStyle.Horizontal)
+            if (Orientation == Orientation.Horizontal)
             {
                 double radians = dx != 0 ? Math.Atan(Math.Abs(dy) / Math.Abs(dx)) : 0;
                 double angle = radians * 180 / Math.PI;

@@ -18,7 +18,7 @@
                  FontSize="12"
                  Origin="{Binding Origin}"
                  MousePoint="{Binding MousePoint}"
-                 RulerStyle="{Binding RulerStyle}"
+                 Orientation="{Binding Orientation}"
                  ScaleUnits="{Binding ScaleUnits}" 
                  ZeroPoint="{Binding ZeroPoint}"/>
 </Window>
