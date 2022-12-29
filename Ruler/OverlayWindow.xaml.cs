@@ -8,21 +8,28 @@ namespace Ruler
     /// </summary>
     public partial class OverlayWindow : Window
     {
+        public event KeyEventHandler? ForwardKeyDown;
+ 
         public OverlayWindow(RulerViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;
 
-            PreviewKeyDown += Window_PreviewKeyDown;
+            //PreviewKeyDown += Window_PreviewKeyDown;
         }
 
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.A)
-            {
-                Close();
-                e.Handled = true;
-            }
+            ForwardKeyDown?.Invoke(this, e);
         }
+
+        //private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.Key == Key.A)
+        //    {
+        //        Close();
+        //        e.Handled = true;
+        //    }
+        //}
     }
 }

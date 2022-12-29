@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -20,21 +19,21 @@ namespace Ruler
             ScaleY = dpiY / 96.0;
 
             BoundsPix = new Rect(
-                info.rcMonitor.left, info.rcMonitor.top,
-                info.rcMonitor.right - info.rcMonitor.left,
-                info.rcMonitor.bottom - info.rcMonitor.top);
+                info.rcMonitor.Left, info.rcMonitor.Top,
+                info.rcMonitor.Right - info.rcMonitor.Left,
+                info.rcMonitor.Bottom - info.rcMonitor.Top);
 
             BoundsDip = new(
-                BoundsPix.Left / ScaleX, BoundsPix.Top/ScaleY,
+                BoundsPix.Left / ScaleX, BoundsPix.Top / ScaleY,
                 BoundsPix.Width / ScaleX, BoundsPix.Height / ScaleY);
 
             WorkingAreaPix = new Rect(
-                info.rcWork.left, info.rcWork.top,
-                info.rcWork.right - info.rcWork.left,
-                info.rcWork.bottom - info.rcWork.top);
+                info.rcWork.Left, info.rcWork.Top,
+                info.rcWork.Right - info.rcWork.Left,
+                info.rcWork.Bottom - info.rcWork.Top);
 
             WorkingAreaDip = new(
-                WorkingAreaPix.Left / ScaleX, WorkingAreaPix.Top/ScaleY,
+                WorkingAreaPix.Left / ScaleX, WorkingAreaPix.Top / ScaleY,
                 WorkingAreaPix.Width / ScaleX, WorkingAreaPix.Height / ScaleY);
 
             Primary = (info.dwFlags & NativeMethods.MONITOR_DEFAULTTOPRIMARY) != 0;
@@ -83,7 +82,7 @@ namespace Ruler
         public static Screen FromWindow(Window window)
         {
             return new Screen(NativeMethods.MonitorFromWindow(
-                new WindowInteropHelper(window).Handle, 
+                new WindowInteropHelper(window).Handle,
                 NativeMethods.MONITOR_DEFAULTTONEAREST));
         }
 

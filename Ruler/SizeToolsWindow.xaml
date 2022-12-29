@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Ruler Layout" 
         FontSize="14"
-        Height="240" Width="480"
+        Height="320" Width="480"
         WindowStyle="ToolWindow">
 
     <Window.Resources>
@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition />
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -71,6 +71,30 @@
                 <RadioButton Content="Percent" Margin="3" GroupName="Unit"
                          IsChecked="{Binding ScaleUnits, 
                             Converter={StaticResource enumBool}, ConverterParameter=Percent, Mode=TwoWay}"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3" Margin="3,0" Header="Magnifier">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Grid.Row="1" Grid.Column="0" Content="Width" Margin="3.0" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Width="60" Margin="3,0" />
+                    <Label Grid.Row="1" Grid.Column="3" Content="Height" Margin="3,0" />
+                    <TextBox Grid.Row="1" Grid.Column="4" Width="60" Margin="3,0" />
+                </StackPanel>
+
+                <DockPanel LastChildFill="true">
+                    <Label Content="Magnification" Margin="3,0"/>
+                    <Slider Margin="3,0"
+                            VerticalAlignment="Center"
+                            Value="{Binding Magnification}"
+                            Minimum="1.0"
+                            Maximum="4.0"
+                            TickFrequency=".1"
+                            IsSnapToTickEnabled="True" 
+                            AutoToolTipPlacement="TopLeft"
+                            AutoToolTipPrecision="1" />
+                </DockPanel>
             </StackPanel>
         </GroupBox>
 

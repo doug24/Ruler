@@ -49,6 +49,15 @@ namespace Ruler
         [ObservableProperty]
         private Edge activeEdge = Edge.Top;
 
+        [ObservableProperty]
+        private bool angleVisible = false;
+
+        [ObservableProperty]
+        private bool magnifierVisible = false;
+
+        [ObservableProperty]
+        private float magnification = 1.6f;
+
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(RulerStyle))

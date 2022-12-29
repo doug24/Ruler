@@ -7,6 +7,44 @@ namespace Ruler
 {
     public static class Extensions
     {
+        public static Window? FindParentWindow(this DependencyObject child)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+
+            //Check if this is the end of the tree
+            if (parent == null) return null;
+
+            Window? parentWindow = parent as Window;
+            if (parentWindow != null)
+            {
+                return parentWindow;
+            }
+            else
+            {
+                //use recursion until it reaches a Window
+                return FindParentWindow(parent);
+            }
+        }
+
+        public static FrameworkElement? FindParentFrameworkElement(this DependencyObject child)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+
+            //Check if this is the end of the tree
+            if (parent == null) return null;
+
+            FrameworkElement? parentElement = parent as FrameworkElement;
+            if (parentElement != null)
+            {
+                return parentElement;
+            }
+            else
+            {
+                //use recursion until it reaches a FrameworkElement
+                return FindParentFrameworkElement(parent);
+            }
+        }
+
         public static IEnumerable<T?> FindLogicalChildren<T>(this DependencyObject parent) where T : DependencyObject
         {
             if (parent == null) yield return null;

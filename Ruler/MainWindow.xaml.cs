@@ -16,8 +16,9 @@ namespace Ruler
     {
         private readonly RulerViewModel viewModel = new();
         private readonly DispatcherTimer dispatcherTimer;
-        private SizeToolsWindow? dlg;
-        private OverlayWindow? overlay;
+        private SizeToolsWindow? optionsDialog;
+        private OverlayWindow? angleWindow;
+        private MagnifierWindow? magnifierWindow;
 
         public MainWindow()
         {
@@ -53,6 +54,14 @@ namespace Ruler
             {
                 UpdateOrigin();
             }
+            else if (e.PropertyName == nameof(viewModel.AngleVisible))
+            {
+                ShowAngle(viewModel.AngleVisible);
+            }
+            else if (e.PropertyName == nameof(viewModel.MagnifierVisible))
+            {
+                ShowMagnifier(viewModel.MagnifierVisible);
+            }
         }
 
         private void MainWindow_LocationChanged(object? sender, EventArgs e)
@@ -86,27 +95,34 @@ namespace Ruler
             }
             else if (e.Key == Key.A)
             {
-                if (overlay != null && overlay.Visibility == Visibility.Visible)
-                {
-                    overlay.Close();
-                }
-                else
-                {
-                    ShowAngle_Click(this, new());
-                }
+                viewModel.AngleVisible = !viewModel.AngleVisible;
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Q)
+            {
+                viewModel.MagnifierVisible = !viewModel.MagnifierVisible;
+                e.Handled = true;
             }
             else if (e.Key == Key.Escape)
             {
-                Close();
+                Exit_Click(sender, new());
                 e.Handled = true;
             }
         }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void TimerCallback(object? sender, EventArgs e)
         {
-            if (overlay != null)
+            if (angleWindow != null)
             {
-                viewModel.MousePoint = MouseTracker.GetMousePosition(overlay);
+                viewModel.MousePoint = MouseTracker.GetMousePosition(angleWindow);
             }
+
+            magnifierWindow?.MoveTo(MouseTracker.GetMousePosition(this));
 
             var newPosition = MouseTracker.GetTrackPoint(this, viewModel.RulerStyle, viewModel.ActiveEdge);
             if (newPosition != viewModel.TrackPoint)
@@ -155,8 +171,9 @@ namespace Ruler
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            overlay?.Close();
-            dlg?.Close();
+            angleWindow?.Close();
+            magnifierWindow?.Close();
+            optionsDialog?.Close();
             base.OnClosing(e);
         }
 
@@ -172,35 +189,42 @@ namespace Ruler
 
         private void ShowLayoutDialog_Click(object sender, RoutedEventArgs e)
         {
-            if (dlg == null)
+            if (optionsDialog == null)
             {
-                dlg = new(viewModel);
-                dlg.Closing += (s, e) => dlg = null;
+                optionsDialog = new(viewModel);
+                optionsDialog.Closing += (s, e) => optionsDialog = null;
             }
-            dlg.Show();
+            optionsDialog.Show();
         }
 
-        private void ShowAngle_Click(object sender, RoutedEventArgs e)
+        private void ShowAngle(bool angleVisible)
         {
-            if (overlay == null)
+            if (angleVisible)
             {
-                overlay = new(viewModel)
+                if (angleWindow == null)
                 {
-                    Owner = this,
-                    WindowStartupLocation = WindowStartupLocation.Manual
-                };
-                overlay.Closing += (s, e) => overlay = null;
+                    angleWindow = new(viewModel)
+                    {
+                        Owner = this,
+                        WindowStartupLocation = WindowStartupLocation.Manual
+                    };
+                    angleWindow.ForwardKeyDown += (s, k) => MainWindow_PreviewKeyDown(s, k);
+                    angleWindow.Closing += (s, e) => angleWindow = null;
+                }
+
+                UpdateOrigin();
+
+                Screen screen = Screen.FromWindow(this);
+                angleWindow.Left = 0;
+                angleWindow.Top = 0;
+                angleWindow.Width = screen.WorkingAreaDip.Width;
+                angleWindow.Height = screen.WorkingAreaDip.Height;
+                angleWindow.Show();
             }
-
-            UpdateOrigin();
-
-            Screen screen = Screen.FromWindow(this);
-            overlay.Left = 0;
-            overlay.Top = 0;
-            overlay.Width = screen.WorkingAreaDip.Width;
-            overlay.Height = screen.WorkingAreaDip.Height;
-            overlay.Show();
-
+            else
+            {
+                angleWindow?.Close();
+            }
         }
 
         private void UpdateOrigin()
@@ -221,5 +245,28 @@ namespace Ruler
             viewModel.Origin = new(x, y);
         }
 
+        private void ShowMagnifier(bool magnifierVisible)
+        {
+            if (magnifierWindow == null)
+            {
+                magnifierWindow = new(viewModel)
+                {
+                    Owner = this
+                };
+                magnifierWindow.ForwardKeyDown += (s, k) => MainWindow_PreviewKeyDown(s, k);
+            }
+
+            if (magnifierVisible)
+            {
+                magnifierWindow.IsRunning = true;
+                magnifierWindow.MoveTo(MouseTracker.GetMousePosition(this));
+                magnifierWindow.Show();
+            }
+            else if (magnifierWindow != null)
+            {
+                magnifierWindow.IsRunning = false;
+                magnifierWindow.Visibility = Visibility.Hidden;
+            }
+        }
     }
 }

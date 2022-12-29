@@ -27,7 +27,14 @@
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Layout" Click="ShowLayoutDialog_Click"/>
-                <MenuItem Header="Angle" Click="ShowAngle_Click"/>
+                <MenuItem Header="Angle" IsCheckable="True" 
+                          IsChecked="{Binding AngleVisible, Mode=TwoWay}"
+                          InputGestureText="A"/>
+                <MenuItem Header="Magnifier" IsCheckable="True" 
+                          IsChecked="{Binding MagnifierVisible,Mode=TwoWay}"
+                          InputGestureText="Q"/>
+                <MenuItem Header="Exit" Click="Exit_Click"
+                          InputGestureText="Esc"/>
             </ContextMenu>
         </Grid.ContextMenu>
 
