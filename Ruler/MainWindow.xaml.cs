@@ -27,9 +27,6 @@ namespace Ruler
 
             DataContext = viewModel;
 
-            Top = 400;
-            Left = 200;
-
             dispatcherTimer = new(TimeSpan.FromMilliseconds(50),
                 DispatcherPriority.Render, TimerCallback, Dispatcher);
 
@@ -172,6 +169,8 @@ namespace Ruler
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            viewModel.SaveSettings();
+
             angleWindow?.Close();
             magnifierWindow?.Close();
             optionsDialog?.Close();

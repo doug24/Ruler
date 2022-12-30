@@ -9,6 +9,11 @@ namespace Ruler
     {
         public RulerViewModel()
         {
+            RestoreSettings();
+
+            // after initialization, watch for changes
+            PropertyChanging += RulerViewModel_PropertyChanging;
+            PropertyChanged += RulerViewModel_PropertyChanged;
         }
 
         [ObservableProperty]
@@ -21,10 +26,10 @@ namespace Ruler
         private Point trackPoint = new();
 
         [ObservableProperty]
-        private Orientation orientation = Orientation.Horizontal;
+        private Thickness resizeBorder = new(4, 0, 4, 0);
 
         [ObservableProperty]
-        private Thickness resizeBorder = new(4, 0, 4, 0);
+        private Orientation orientation = Orientation.Horizontal;
 
         [ObservableProperty]
         private Units scaleUnits = Units.DIP;
@@ -33,10 +38,10 @@ namespace Ruler
         private ZeroPoint zeroPoint = ZeroPoint.Near;
 
         [ObservableProperty]
-        private double longAxis = 800;
+        private double left = 200;
 
         [ObservableProperty]
-        private double shortAxis = 80;
+        private double top = 400;
 
         [ObservableProperty]
         private double width = 800;
@@ -59,23 +64,33 @@ namespace Ruler
         [ObservableProperty]
         private float magnification = 1.6f;
 
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
+        {
+            // save current layout values before changing
+            if (e.PropertyName == nameof(Orientation))
+            {
+                SaveCurrentLayout();
+            }
+        }
+
+        private void RulerViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Orientation))
             {
+                RulerSettings.Default.Orientation = Orientation;
+
+                // restore saved values for this orientation
+                RestoreCurrentLayout();
+
                 if (Orientation == Orientation.Horizontal)
                 {
                     ResizeBorder = new Thickness(4, 0, 4, 0);
                     ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
-                    Width = LongAxis;
-                    Height = ShortAxis;
                 }
                 else if (Orientation == Orientation.Vertical)
                 {
                     ResizeBorder = new Thickness(0, 4, 0, 4);
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
-                    Width = ShortAxis;
-                    Height = LongAxis;
                 }
             }
             else if (e.PropertyName == nameof(Flip))
@@ -89,30 +104,44 @@ namespace Ruler
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
                 }
             }
-            else if (e.PropertyName == nameof(Width))
-            {
-                if (Orientation == Orientation.Horizontal)
-                {
-                    LongAxis = Width;
-                }
-                else if (Orientation == Orientation.Vertical)
-                {
-                    ShortAxis = Width;
-                }
-            }
-            else if (e.PropertyName == nameof(Height))
-            {
-                if (Orientation == Orientation.Horizontal)
-                {
-                    ShortAxis = Height;
-                }
-                else if (Orientation == Orientation.Vertical)
-                {
-                    LongAxis = Height;
-                }
-            }
+        }
 
-            base.OnPropertyChanged(e);
+        private void RestoreSettings()
+        {
+            Orientation = RulerSettings.Default.Orientation;
+            ScaleUnits = RulerSettings.Default.ScaleUnits;
+            Magnification = RulerSettings.Default.Magnification;
+
+            RestoreCurrentLayout();
+        }
+
+        internal void SaveSettings()
+        {
+            RulerSettings.Default.Orientation = Orientation;
+            RulerSettings.Default.ScaleUnits = ScaleUnits;
+            RulerSettings.Default.Magnification = Magnification;
+
+            SaveCurrentLayout();
+        }
+
+        private void RestoreCurrentLayout()
+        {
+            Left = RulerSettings.CurrentLayout.Left;
+            Top = RulerSettings.CurrentLayout.Top;
+            Width = RulerSettings.CurrentLayout.Width;
+            Height = RulerSettings.CurrentLayout.Height;
+            ZeroPoint = RulerSettings.CurrentLayout.ZeroPoint;
+            Flip = RulerSettings.CurrentLayout.Flip;
+        }
+
+        private void SaveCurrentLayout()
+        {
+            RulerSettings.CurrentLayout.Left = Left;
+            RulerSettings.CurrentLayout.Top = Top;
+            RulerSettings.CurrentLayout.Width = Width;
+            RulerSettings.CurrentLayout.Height = Height;
+            RulerSettings.CurrentLayout.ZeroPoint = ZeroPoint;
+            RulerSettings.CurrentLayout.Flip = Flip;
         }
     }
 }

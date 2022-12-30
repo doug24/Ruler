@@ -27,33 +27,33 @@ namespace Ruler
                 onePixelInDip = 1.0 / scr.ScaleX;
             }
 
-            Pen blackPen = new(Foreground, onePixelInDip);
-            blackPen.Freeze();
+            Pen foregroundPen = new(RulerSettings.Default.Foreground, onePixelInDip);
+            foregroundPen.Freeze();
 
-            RenderBackground(drawingContext, blackPen);
+            RenderBackground(drawingContext, foregroundPen);
 
             if (Orientation == Orientation.Horizontal)
             {
-                RenderHorizontalScale(drawingContext, blackPen);
+                RenderHorizontalScale(drawingContext, foregroundPen);
             }
             else
             {
-                RenderVerticalScale(drawingContext, blackPen);
+                RenderVerticalScale(drawingContext, foregroundPen);
             }
         }
 
-        private void RenderBackground(DrawingContext dc, Pen blackPen)
+        private void RenderBackground(DrawingContext dc, Pen foregroundPen)
         {
             var width = ActualWidth;
             var height = ActualHeight;
 
-            dc.DrawRectangle(Brushes.WhiteSmoke, blackPen,
+            dc.DrawRectangle(RulerSettings.Default.Background, foregroundPen,
                 new(new Point(0, 0), new Size(ActualWidth, ActualHeight)));
-            dc.DrawLine(blackPen, new Point(0, 0.5), new Point(width, 0.5));
-            dc.DrawLine(blackPen, new Point(0.5, 0), new Point(0.5, height));
+            dc.DrawLine(foregroundPen, new Point(0, 0.5), new Point(width, 0.5));
+            dc.DrawLine(foregroundPen, new Point(0.5, 0), new Point(0.5, height));
         }
 
-        private void RenderHorizontalScale(DrawingContext dc, Pen blackPen)
+        private void RenderHorizontalScale(DrawingContext dc, Pen foregroundPen)
         {
             var width = ActualWidth;
             var height = ActualHeight;
@@ -72,7 +72,7 @@ namespace Ruler
                 {
                     double dip = DipConverter.ToDIP(unit, width,
                         ZeroPoint, ScaleUnits, Orientation.Horizontal);
-                    Drawline(dc, blackPen, dip, len, Orientation.Horizontal);
+                    Drawline(dc, foregroundPen, dip, len, Orientation.Horizontal);
                 }
 
                 if (Modulo(unit, tm.LabelTick, tm.Step))
@@ -88,15 +88,15 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.X <= width, in Dips
-            Drawline(dc, new Pen(Brushes.ForestGreen, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
+            Drawline(dc, new Pen(RulerSettings.Default.MarkerBrush, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
 
             double tx = DipConverter.ToDIP(TrackPoint.X, width,
                 ZeroPoint, Units.DIP, Orientation.Horizontal);
             double txInUnits = DipConverter.Convert(tx, ScaleUnits, Orientation.Horizontal);
             double tyInUnits = DipConverter.Convert(TrackPoint.Y, ScaleUnits, Orientation.Vertical);
 
-            var xmarker = FormatText(txInUnits, Brushes.ForestGreen);
-            var ymarker = FormatText(tyInUnits, Brushes.ForestGreen);
+            var xmarker = FormatText(txInUnits, RulerSettings.Default.MarkerBrush);
+            var ymarker = FormatText(tyInUnits, RulerSettings.Default.MarkerBrush);
 
             var xpos1 = TrackPoint.X - xmarker.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - xmarker.Width - 6;
             var ypos1 = Flip ? 0 : height - 2 * xmarker.Height;
@@ -114,7 +114,7 @@ namespace Ruler
             //dc.DrawText(t2, new Point(width - t2.Width - 1, height - t1.Height));
         }
 
-        private void RenderVerticalScale(DrawingContext dc, Pen blackPen)
+        private void RenderVerticalScale(DrawingContext dc, Pen foregroundPen)
         {
             var width = ActualWidth;
             var height = ActualHeight;
@@ -133,7 +133,7 @@ namespace Ruler
                 {
                     double dip = DipConverter.ToDIP(unit, height,
                         ZeroPoint, ScaleUnits, Orientation.Vertical);
-                    Drawline(dc, blackPen, dip, len, Orientation.Vertical);
+                    Drawline(dc, foregroundPen, dip, len, Orientation.Vertical);
                 }
 
                 if (Modulo(unit, tm.LabelTick, tm.Step))
@@ -149,15 +149,15 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.Y <= height, in DIPs
-            Drawline(dc, new Pen(Brushes.ForestGreen, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
+            Drawline(dc, new Pen(RulerSettings.Default.MarkerBrush, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
 
             double txInUnits = DipConverter.Convert(TrackPoint.X, ScaleUnits, Orientation.Vertical);
             double ty = DipConverter.ToDIP(TrackPoint.Y, height,
                 ZeroPoint, Units.DIP, Orientation.Vertical);
             double tyInUnits = DipConverter.Convert(ty, ScaleUnits, Orientation.Vertical);
 
-            var xmarker = FormatText(txInUnits, Brushes.ForestGreen);
-            var ymarker = FormatText(tyInUnits, Brushes.ForestGreen);
+            var xmarker = FormatText(txInUnits, RulerSettings.Default.MarkerBrush);
+            var ymarker = FormatText(tyInUnits, RulerSettings.Default.MarkerBrush);
             var measure = FormatText(333.3);
 
             var xpos = Flip ? width - measure.Width - 2 : 4;
