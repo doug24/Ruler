@@ -14,6 +14,9 @@ namespace Ruler
         public static ILayout CurrentLayout => Default.Orientation == Orientation.Horizontal ?
             Default.HorizontalRuler : Default.VerticalRuler;
 
+        public static IColorPalette CurrentTheme => Default.ColorTheme == Theme.Light ? LightTheme :
+            Default.ColorTheme == Theme.Dark ? DarkTheme : Default.CustomColors;
+
         static RulerSettings()
         {
             settings = new ConfigurationBuilder<IRulerSettings>()
@@ -22,25 +25,13 @@ namespace Ruler
                 .Build();
 
 
-            if (settings.Foreground == default)
+            if (settings.CustomColors.Foreground == default)
             {
-                settings.Foreground = Brushes.Black;
-            }
-            if (settings.Background == default)
-            {
-                settings.Background = Brushes.White;
-            }
-            if (settings.MarkerBrush == default)
-            {
-                settings.MarkerBrush = Brushes.ForestGreen;
-            }
-            if (settings.AngleBrush == default)
-            {
-                settings.AngleBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600"));
-            }
-            if (settings.InfoBrush == default)
-            {
-                settings.InfoBrush = SystemColors.InfoBrush;
+                settings.CustomColors.Foreground = Brushes.Black;
+                settings.CustomColors.Background = Brushes.White;
+                settings.CustomColors.Marker = Brushes.ForestGreen;
+                settings.CustomColors.Angle = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600"));
+                settings.CustomColors.Info = SystemColors.InfoBrush;
             }
 
             if (settings.HorizontalRuler.Width < 0)
@@ -60,5 +51,35 @@ namespace Ruler
             }
         }
 
+        public static IColorPalette LightTheme => new ColorPalette();
+
+        public static IColorPalette DarkTheme => new ColorPalette()
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF202020")),
+            Marker = Brushes.LightGreen,
+            Angle = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600")),
+            Info = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF606060")),
+        };
+
+
+    }
+
+    public class ColorPalette : IColorPalette
+    {
+        public ColorPalette()
+        {
+            Foreground = Brushes.Black;
+            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
+            Marker = Brushes.ForestGreen;
+            Angle = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600"));
+            Info = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
+        }
+
+        public SolidColorBrush Foreground { get; set; }
+        public SolidColorBrush Background { get; set; }
+        public SolidColorBrush Marker { get; set; }
+        public SolidColorBrush Angle { get; set; }
+        public SolidColorBrush Info { get; set; }
     }
 }

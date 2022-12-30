@@ -4,6 +4,8 @@ using System.Windows.Media;
 
 namespace Ruler
 {
+    public enum Theme { Light, Dark, Custom }
+
     public interface IRulerSettings
     {
         [DefaultValue(Orientation.Horizontal)]
@@ -15,16 +17,14 @@ namespace Ruler
         [DefaultValue(1.6f)]
         float Magnification { get; set; }
 
-        SolidColorBrush Foreground { get; set; }
-
-        SolidColorBrush Background { get; set; }
-
-        SolidColorBrush MarkerBrush { get; set; }
-        SolidColorBrush AngleBrush { get; set;}
-        SolidColorBrush InfoBrush { get; set; }
+        [DefaultValue(Theme.Light)]
+        Theme ColorTheme { get; set; }
 
         ILayout HorizontalRuler { get; }
+
         ILayout VerticalRuler { get; }
+
+        IColorPalette CustomColors { get; }
     }
 
     public interface ILayout
@@ -43,6 +43,15 @@ namespace Ruler
 
         [DefaultValue(false)]
         bool Flip { get; set; }
+    }
+
+    public interface IColorPalette
+    {
+        SolidColorBrush Foreground { get; set; }
+        SolidColorBrush Background { get; set; }
+        SolidColorBrush Marker { get; set; }
+        SolidColorBrush Angle { get; set; }
+        SolidColorBrush Info { get; set; }
     }
 
 }

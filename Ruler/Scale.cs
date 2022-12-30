@@ -27,7 +27,7 @@ namespace Ruler
                 onePixelInDip = 1.0 / scr.ScaleX;
             }
 
-            Pen foregroundPen = new(RulerSettings.Default.Foreground, onePixelInDip);
+            Pen foregroundPen = new(RulerSettings.CurrentTheme.Foreground, onePixelInDip);
             foregroundPen.Freeze();
 
             RenderBackground(drawingContext, foregroundPen);
@@ -47,7 +47,7 @@ namespace Ruler
             var width = ActualWidth;
             var height = ActualHeight;
 
-            dc.DrawRectangle(RulerSettings.Default.Background, foregroundPen,
+            dc.DrawRectangle(RulerSettings.CurrentTheme.Background, foregroundPen,
                 new(new Point(0, 0), new Size(ActualWidth, ActualHeight)));
             dc.DrawLine(foregroundPen, new Point(0, 0.5), new Point(width, 0.5));
             dc.DrawLine(foregroundPen, new Point(0.5, 0), new Point(0.5, height));
@@ -88,15 +88,15 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.X <= width, in Dips
-            Drawline(dc, new Pen(RulerSettings.Default.MarkerBrush, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
+            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
 
             double tx = DipConverter.ToDIP(TrackPoint.X, width,
                 ZeroPoint, Units.DIP, Orientation.Horizontal);
             double txInUnits = DipConverter.Convert(tx, ScaleUnits, Orientation.Horizontal);
             double tyInUnits = DipConverter.Convert(TrackPoint.Y, ScaleUnits, Orientation.Vertical);
 
-            var xmarker = FormatText(txInUnits, RulerSettings.Default.MarkerBrush);
-            var ymarker = FormatText(tyInUnits, RulerSettings.Default.MarkerBrush);
+            var xmarker = FormatText(txInUnits, RulerSettings.CurrentTheme.Marker);
+            var ymarker = FormatText(tyInUnits, RulerSettings.CurrentTheme.Marker);
 
             var xpos1 = TrackPoint.X - xmarker.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - xmarker.Width - 6;
             var ypos1 = Flip ? 0 : height - 2 * xmarker.Height;
@@ -149,15 +149,15 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.Y <= height, in DIPs
-            Drawline(dc, new Pen(RulerSettings.Default.MarkerBrush, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
+            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
 
             double txInUnits = DipConverter.Convert(TrackPoint.X, ScaleUnits, Orientation.Vertical);
             double ty = DipConverter.ToDIP(TrackPoint.Y, height,
                 ZeroPoint, Units.DIP, Orientation.Vertical);
             double tyInUnits = DipConverter.Convert(ty, ScaleUnits, Orientation.Vertical);
 
-            var xmarker = FormatText(txInUnits, RulerSettings.Default.MarkerBrush);
-            var ymarker = FormatText(tyInUnits, RulerSettings.Default.MarkerBrush);
+            var xmarker = FormatText(txInUnits, RulerSettings.CurrentTheme.Marker);
+            var ymarker = FormatText(tyInUnits, RulerSettings.CurrentTheme.Marker);
             var measure = FormatText(333.3);
 
             var xpos = Flip ? width - measure.Width - 2 : 4;

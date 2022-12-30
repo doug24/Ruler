@@ -41,7 +41,6 @@
         </Grid.ContextMenu>
 
         <local:Scale x:Name="ruler"
-                     Foreground="Black"
                      FontSize="12"
                      Orientation="{Binding Orientation}"
                      ScaleUnits="{Binding ScaleUnits}"
@@ -49,11 +48,11 @@
                      Flip="{Binding Flip}"
                      TrackPoint="{Binding TrackPoint}"/>
 
-        <Ellipse Fill="red" 
+        <!--<Ellipse Fill="red" 
                  Width="6"
                  Height="6"
                  HorizontalAlignment="Center" 
-                 VerticalAlignment="Center" />
+                 VerticalAlignment="Center" />-->
 
         <!--<TextBlock Text="{Binding ElementName=ruler, Path=ActualWidth}"
                     FontSize="14"

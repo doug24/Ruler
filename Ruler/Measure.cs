@@ -188,7 +188,7 @@ namespace Ruler
         {
             if (ScaleUnits == Units.Inch)
             {
-                return FormatFraction(num, 32, Foreground);
+                return FormatFraction(num, 32, RulerSettings.CurrentTheme.Foreground);
             }
             else if (ScaleUnits == Units.CM)
             {
@@ -220,7 +220,7 @@ namespace Ruler
 
         protected FormattedText FormatText(string text)
         {
-            return FormatText(text, Foreground);
+            return FormatText(text, RulerSettings.CurrentTheme.Foreground);
         }
 
         protected FormattedText FormatText(string text, Brush foreground)

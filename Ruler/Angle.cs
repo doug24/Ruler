@@ -36,10 +36,10 @@ namespace Ruler
 
         protected override void OnRender(DrawingContext dc)
         {
-            Pen linePen = new(RulerSettings.Default.AngleBrush, 1);
+            Pen linePen = new(RulerSettings.CurrentTheme.Angle, 1);
             linePen.Freeze();
 
-            Pen foregroundPen = new(RulerSettings.Default.Foreground, 1);
+            Pen foregroundPen = new(RulerSettings.CurrentTheme.Foreground, 1);
             foregroundPen.Freeze();
 
             double x = Math.Min(Origin.X, MousePoint.X);
@@ -56,7 +56,7 @@ namespace Ruler
 
             Rect textRect = new(textOrigin, new Size(label.Width, label.Height));
             textRect.Inflate(4, 4);
-            dc.DrawRoundedRectangle(RulerSettings.Default.InfoBrush, foregroundPen, textRect, 4, 4);
+            dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, foregroundPen, textRect, 4, 4);
             dc.DrawText(label, textOrigin);
 
             dc.DrawCircularArc(null, linePen, Origin, radius,
@@ -196,7 +196,7 @@ namespace Ruler
                 }
             }
 
-            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0), RulerSettings.Default.Foreground);
+            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0), RulerSettings.CurrentTheme.Foreground);
             textOrigin = DrawingExtensions.GetEndPointOnRadus(Origin, radius + 12,
                 startDegrees, sweepDegrees / 2, sweepDirection);
             textOrigin.Offset(textOffset ? -label.Width : 0, -label.Height / 2);
