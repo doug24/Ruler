@@ -17,6 +17,8 @@
     <local:Angle FontSize="12"
                  Origin="{Binding Origin}"
                  MousePoint="{Binding MousePoint}"
+                 TrackPoint="{Binding TrackPoint}"
+                 Perpendicular="{Binding Perpendicular}"
                  Orientation="{Binding Orientation}"
                  ScaleUnits="{Binding ScaleUnits}" 
                  ZeroPoint="{Binding ZeroPoint}"/>

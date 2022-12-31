@@ -93,19 +93,12 @@ namespace Ruler
             double tx = DipConverter.ToDIP(TrackPoint.X, width,
                 ZeroPoint, Units.DIP, Orientation.Horizontal);
             double txInUnits = DipConverter.Convert(tx, ScaleUnits, Orientation.Horizontal);
-            double tyInUnits = DipConverter.Convert(TrackPoint.Y, ScaleUnits, Orientation.Vertical);
-
             var xmarker = FormatText(txInUnits, RulerSettings.CurrentTheme.Marker);
-            var ymarker = FormatText(tyInUnits, RulerSettings.CurrentTheme.Marker);
 
             var xpos1 = TrackPoint.X - xmarker.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - xmarker.Width - 6;
-            var ypos1 = Flip ? 0 : height - 2 * xmarker.Height;
-
-            var xpos2 = TrackPoint.X - ymarker.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - ymarker.Width - 6;
-            var ypos2 = Flip ? xmarker.Height : height - ymarker.Height;
+            var ypos1 = Flip ? xmarker.Height + 2 : height - 2 * xmarker.Height;
 
             dc.DrawText(xmarker, new(xpos1, ypos1));
-            dc.DrawText(ymarker, new(xpos2, ypos2));
 
             //Window w = Window.GetWindow(this);
             //var t1 = w != null ? FormatText(w.Left) : FormatText(0);
@@ -151,23 +144,16 @@ namespace Ruler
             // 0 <= TrackPoint.Y <= height, in DIPs
             Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
 
-            double txInUnits = DipConverter.Convert(TrackPoint.X, ScaleUnits, Orientation.Vertical);
             double ty = DipConverter.ToDIP(TrackPoint.Y, height,
                 ZeroPoint, Units.DIP, Orientation.Vertical);
             double tyInUnits = DipConverter.Convert(ty, ScaleUnits, Orientation.Vertical);
-
-            var xmarker = FormatText(txInUnits, RulerSettings.CurrentTheme.Marker);
             var ymarker = FormatText(tyInUnits, RulerSettings.CurrentTheme.Marker);
-            var measure = FormatText(333.3);
 
-            var xpos = Flip ? width - measure.Width - 2 : 4;
-            var ypos1 = TrackPoint.Y - 2 * ymarker.Height - 1 < 0 ?
-                TrackPoint.Y + 1 : TrackPoint.Y - 2 * ymarker.Height - 1;
-            var ypos2 = TrackPoint.Y - 2 * ymarker.Height - 1 < 0 ?
-                TrackPoint.Y + ymarker.Height + 1 : TrackPoint.Y - ymarker.Height - 1;
+            var xpos = Flip ? width - ymarker.Width - 4 : 4;
+            var ypos1 = TrackPoint.Y - ymarker.Height - 1 < 0 ?
+                TrackPoint.Y + 1 : TrackPoint.Y - ymarker.Height - 1;
 
             dc.DrawText(ymarker, new(xpos, ypos1));
-            dc.DrawText(xmarker, new(xpos, ypos2));
         }
     }
 }

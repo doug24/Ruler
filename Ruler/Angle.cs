@@ -33,14 +33,41 @@ namespace Ruler
             DependencyProperty.Register("MousePoint", typeof(Point), typeof(Angle),
             new FrameworkPropertyMetadata(new Point(), FrameworkPropertyMetadataOptions.AffectsRender));
 
+        public bool Perpendicular
+        {
+            get { return (bool)GetValue(PerpendicularProperty); }
+            set { SetValue(PerpendicularProperty, value); }
+        }
+
+        public static readonly DependencyProperty PerpendicularProperty =
+            DependencyProperty.Register("Perpendicular", typeof(bool), typeof(Angle),
+            new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsRender));
+
 
         protected override void OnRender(DrawingContext dc)
         {
+            if (Application.Current.MainWindow != null)
+            {
+                Screen scr = Screen.FromWindow(Application.Current.MainWindow);
+                onePixelInDip = 1.0 / scr.ScaleX;
+            }
+
             Pen linePen = new(RulerSettings.CurrentTheme.Angle, 1);
             linePen.Freeze();
 
             Pen foregroundPen = new(RulerSettings.CurrentTheme.Foreground, 1);
             foregroundPen.Freeze();
+
+            Pen markerPen = new(RulerSettings.CurrentTheme.Marker, onePixelInDip);
+            markerPen.Freeze();
+
+            SolidColorBrush transparentBrush = new()
+            {
+                Color = Colors.White,
+                Opacity = 0.01
+            };
+            transparentBrush.Freeze();
+
 
             double x = Math.Min(Origin.X, MousePoint.X);
             double w = Math.Max(Origin.X, MousePoint.X) - x;
@@ -54,15 +81,40 @@ namespace Ruler
             GetArcLayout(dy, dx, radius, out double startDegrees, out double sweepDegrees,
                 out SweepDirection sweepDirection, out Point textOrigin, out FormattedText label);
 
+            dc.DrawCircularArc(null, linePen, Origin, radius,
+                startDegrees, sweepDegrees, sweepDirection);
+
+            // this keeps the mouse point 'within' the control and
+            // not click through to other windows
+            dc.DrawRectangle(transparentBrush, null, new(MousePoint.X - 16, MousePoint.Y - 16, 32, 32));
+
+            // hypotenuse
+            dc.DrawLine(linePen, Origin, MousePoint);
+
+            if (Perpendicular)
+            {
+                Point pt = Orientation == Orientation.Horizontal ?
+                    new(MousePoint.X, Origin.Y) : new(Origin.X, MousePoint.Y);
+                dc.DrawLine(markerPen, pt, MousePoint);
+
+                // perpendicular offset text
+                double offset = Orientation == Orientation.Horizontal ? TrackPoint.Y : TrackPoint.X;
+                double offsetInUnits = DipConverter.Convert(offset, ScaleUnits, Orientation);
+                var offsetMarker = FormatText(offsetInUnits, RulerSettings.CurrentTheme.Marker);
+                Point markerPoint = Orientation == Orientation.Horizontal ?
+                    new(MousePoint.X + 6, (MousePoint.Y + Origin.Y) / 2) :
+                    new((MousePoint.X + Origin.X) / 2, MousePoint.Y + 6);
+                Rect offsetRect = new(markerPoint, new Size(offsetMarker.Width, offsetMarker.Height));
+                offsetRect.Inflate(2, 2);
+                dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, null, offsetRect, 2, 2);
+                dc.DrawText(offsetMarker, markerPoint);
+            }
+
+            // angle text
             Rect textRect = new(textOrigin, new Size(label.Width, label.Height));
             textRect.Inflate(4, 4);
             dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, foregroundPen, textRect, 4, 4);
             dc.DrawText(label, textOrigin);
-
-            dc.DrawCircularArc(null, linePen, Origin, radius,
-                startDegrees, sweepDegrees, sweepDirection);
-
-            dc.DrawLine(linePen, Origin, MousePoint);
         }
 
         private void GetArcLayout(double dy, double dx, double radius,

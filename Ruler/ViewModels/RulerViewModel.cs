@@ -59,6 +59,9 @@ namespace Ruler
         private bool angleVisible = false;
 
         [ObservableProperty]
+        private bool perpendicular = true;
+
+        [ObservableProperty]
         private bool magnifierVisible = false;
 
         [ObservableProperty]
@@ -111,6 +114,7 @@ namespace Ruler
             Orientation = RulerSettings.Default.Orientation;
             ScaleUnits = RulerSettings.Default.ScaleUnits;
             Magnification = RulerSettings.Default.Magnification;
+            Perpendicular = RulerSettings.Default.Perpendicular;
 
             RestoreCurrentLayout();
         }
@@ -120,6 +124,7 @@ namespace Ruler
             RulerSettings.Default.Orientation = Orientation;
             RulerSettings.Default.ScaleUnits = ScaleUnits;
             RulerSettings.Default.Magnification = Magnification;
+            RulerSettings.Default.Perpendicular = Perpendicular;
 
             SaveCurrentLayout();
         }

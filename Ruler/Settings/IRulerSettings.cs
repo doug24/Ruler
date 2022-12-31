@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -16,6 +17,9 @@ namespace Ruler
 
         [DefaultValue(1.6f)]
         float Magnification { get; set; }
+
+        [DefaultValue(true)]
+        bool Perpendicular { get; set; }
 
         [DefaultValue(Theme.Light)]
         Theme ColorTheme { get; set; }

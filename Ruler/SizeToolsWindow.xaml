@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:Ruler"
         mc:Ignorable="d"
         Title="Ruler Layout" 
-        FontSize="14"
-        Height="320" Width="480"
-        WindowStyle="ToolWindow">
+        FontSize="13"
+        Width="480"
+        SizeToContent="Height"
+        WindowStyle="SingleBorderWindow">
 
     <Window.Resources>
         <local:EnumBooleanConverter x:Key="enumBool"/>
@@ -16,6 +17,7 @@
     
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -95,6 +97,13 @@
                             AutoToolTipPlacement="TopLeft"
                             AutoToolTipPrecision="1" />
                 </DockPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="4" Margin="3,0" Header="Angle">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Content="Show Perpendicular" Margin="3"
+                          IsChecked="{Binding Perpendicular}"/>
             </StackPanel>
         </GroupBox>
 
