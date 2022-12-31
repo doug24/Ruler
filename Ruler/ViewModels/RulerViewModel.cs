@@ -65,6 +65,12 @@ namespace Ruler
         private bool magnifierVisible = false;
 
         [ObservableProperty]
+        private double magnifierWidth = 200;
+
+        [ObservableProperty]
+        private double magnifierHeight = 200;
+
+        [ObservableProperty]
         private float magnification = 1.6f;
 
         private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
@@ -115,6 +121,8 @@ namespace Ruler
             ScaleUnits = RulerSettings.Default.ScaleUnits;
             Magnification = RulerSettings.Default.Magnification;
             Perpendicular = RulerSettings.Default.Perpendicular;
+            MagnifierWidth = RulerSettings.Default.MagnifierWidth;
+            MagnifierHeight = RulerSettings.Default.MagnifierHeight;
 
             RestoreCurrentLayout();
         }
@@ -125,6 +133,8 @@ namespace Ruler
             RulerSettings.Default.ScaleUnits = ScaleUnits;
             RulerSettings.Default.Magnification = Magnification;
             RulerSettings.Default.Perpendicular = Perpendicular;
+            RulerSettings.Default.MagnifierWidth = MagnifierWidth;
+            RulerSettings.Default.MagnifierHeight = MagnifierHeight;
 
             SaveCurrentLayout();
         }

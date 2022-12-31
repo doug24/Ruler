@@ -18,6 +18,12 @@ namespace Ruler
         [DefaultValue(1.6f)]
         float Magnification { get; set; }
 
+        [DefaultValue(200d)]
+        double MagnifierWidth { get; set; }
+
+        [DefaultValue(200d)]
+        double MagnifierHeight { get; set; }
+
         [DefaultValue(true)]
         bool Perpendicular { get; set; }
 

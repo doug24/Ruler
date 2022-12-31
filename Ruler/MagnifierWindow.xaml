@@ -10,8 +10,11 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Height="200" 
-        Width="200">
+        WindowStartupLocation="Manual"
+        Height="{Binding MagnifierHeight, Mode=TwoWay}" 
+        Width="{Binding MagnifierWidth, Mode=TwoWay}"
+        d:DesignHeight="100"
+        d:DesignWidth="100">
     
     <Border Background="White" BorderBrush="Black" BorderThickness="1">
         <local:Magnifier x:Name="magControl"
