@@ -61,6 +61,7 @@ namespace Ruler
                 Math.Abs(lastSnapPos.X - pt.X) > 1 ||
                 Math.Abs(lastSnapPos.Y - pt.Y) > 1)
             {
+                lastSnapPos = pt;
                 double offsetX = ActualWidth / 2;
                 double offsetY = ActualHeight / 2;
 

@@ -259,8 +259,8 @@ namespace Ruler
             if (magnifierVisible)
             {
                 magnifierWindow.IsRunning = true;
-                magnifierWindow.MoveTo(MouseTracker.GetMousePosition(this));
                 magnifierWindow.Show();
+                magnifierWindow.MoveTo(MouseTracker.GetMousePosition(this));
             }
             else if (magnifierWindow != null)
             {
