@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         x:Name="mainWindow"
         Title="Ruler"
+        Icon="/ruler;component/images/ruler.ico"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"

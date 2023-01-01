@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Ruler"
         mc:Ignorable="d"
         Title="" 
+        Icon="/ruler;component/images/ruler.ico"
         ShowInTaskbar="False"
         WindowStyle="None"
         AllowsTransparency="True"

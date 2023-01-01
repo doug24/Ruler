@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Ruler"
         mc:Ignorable="d"
         Title="Ruler Layout" 
+        Icon="/ruler;component/images/ruler.ico"
         FontSize="13"
         Width="480"
         SizeToContent="Height"
