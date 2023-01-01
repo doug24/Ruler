@@ -71,40 +71,80 @@ namespace Ruler
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-            if (e.Key == Key.Right)
+            switch (e.Key)
             {
-                Left += ctrl ? 5 : 0.5;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Left)
-            {
-                Left -= ctrl ? 5 : 0.5;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Up)
-            {
-                Top -= ctrl ? 5 : 0.5;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Down)
-            {
-                Top += ctrl ? 5 : 0.5;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.A)
-            {
-                viewModel.AngleVisible = !viewModel.AngleVisible;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Q)
-            {
-                viewModel.MagnifierVisible = !viewModel.MagnifierVisible;
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Escape)
-            {
-                Exit_Click(sender, new());
-                e.Handled = true;
+                case Key.Right:
+                    Left += ctrl ? 5 : 0.5;
+                    e.Handled = true;
+                    break;
+                case Key.Left:
+                    Left -= ctrl ? 5 : 0.5;
+                    e.Handled = true;
+                    break;
+                case Key.Up:
+                    Top -= ctrl ? 5 : 0.5;
+                    e.Handled = true;
+                    break;
+                case Key.Down:
+                    Top += ctrl ? 5 : 0.5;
+                    e.Handled = true;
+                    break;
+                case Key.A:
+                    viewModel.AngleVisible = !viewModel.AngleVisible;
+                    e.Handled = true;
+                    break;
+                case Key.Q:
+                    viewModel.MagnifierVisible = !viewModel.MagnifierVisible;
+                    e.Handled = true;
+                    break;
+                case Key.H:
+                    viewModel.Orientation = Orientation.Horizontal;
+                    e.Handled = true;
+                    break;
+                case Key.V:
+                    viewModel.Orientation = Orientation.Vertical;
+                    e.Handled = true;
+                    break;
+                case Key.S:
+                    viewModel.Flip = !viewModel.Flip;
+                    e.Handled = true;
+                    break;
+                case Key.N:
+                    viewModel.ZeroPoint = ZeroPoint.Near;
+                    e.Handled = true;
+                    break;
+                case Key.F:
+                    viewModel.ZeroPoint = ZeroPoint.Far;
+                    e.Handled = true;
+                    break;
+                case Key.D1:
+                    viewModel.ScaleUnits = Units.Pixel;
+                    e.Handled = true;
+                    break;
+                case Key.D2:
+                    viewModel.ScaleUnits = Units.DIP;
+                    e.Handled = true;
+                    break;
+                case Key.D3:
+                    viewModel.ScaleUnits = Units.Point;
+                    e.Handled = true;
+                    break;
+                case Key.D4:
+                    viewModel.ScaleUnits = Units.CM;
+                    e.Handled = true;
+                    break;
+                case Key.D5:
+                    viewModel.ScaleUnits = Units.Inch;
+                    e.Handled = true;
+                    break;
+                case Key.D6:
+                    viewModel.ScaleUnits = Units.Percent;
+                    e.Handled = true;
+                    break;
+                case Key.Escape:
+                    Exit_Click(sender, new());
+                    e.Handled = true;
+                    break;
             }
         }
 
