@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Ruler
 {
     public class Scale : Measure
     {
+        private Rect hotSpot = new(0, 0, 20, 80);
+        private Orientation? previous = null;
+        private readonly ToolTip toolTip = new();
+        private readonly DispatcherTimer timer = new DispatcherTimer();
+
         static Scale()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Scale),
@@ -17,6 +25,54 @@ namespace Ruler
         {
             SetValue(SnapsToDevicePixelsProperty, true);
             SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
+
+            timer.Interval = TimeSpan.FromSeconds(5);
+            timer.Tick += Timer_Tick;
+
+            Loaded += Scale_Loaded;
+            PreviewMouseMove += Scale_PreviewMouseMove;
+        }
+
+        private void Scale_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window parent = Window.GetWindow(this);
+            if (parent != null)
+            {
+                Binding binding = new("ScaleToolTip");
+                binding.Source = parent.DataContext;
+                toolTip.SetBinding(ContentControl.ContentProperty, binding);
+
+                parent.Closing += (s, e) =>
+                {
+                    toolTip.IsOpen = false;
+                    timer.Stop();
+                };
+            }
+        }
+
+        private void Scale_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (toolTip != null)
+            {
+                // Retrieve the coordinate of the mouse position.
+                Point pt = e.GetPosition(this);
+                if (hotSpot.Contains(pt))
+                {
+                    toolTip.IsOpen = true;
+                    timer.Start();
+                }
+                else
+                {
+                    toolTip.IsOpen = false;
+                    timer.Stop();
+                }
+            }
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            timer.Stop();
+            toolTip.IsOpen = false;
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -29,6 +85,16 @@ namespace Ruler
 
             Pen foregroundPen = new(RulerSettings.CurrentTheme.Foreground, onePixelInDip);
             foregroundPen.Freeze();
+
+            if (Orientation != previous)
+            {
+                previous = Orientation;
+
+                toolTip.IsOpen = false;
+                double width = Orientation == Orientation.Horizontal ? 20 : ActualWidth;
+                double height = Orientation == Orientation.Vertical ? 20 : ActualHeight;
+                hotSpot = new(0, 0, width, height);
+            }
 
             RenderBackground(drawingContext, foregroundPen);
 

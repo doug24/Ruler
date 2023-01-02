@@ -24,7 +24,9 @@
         SnapsToDevicePixels="True">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="{Binding ResizeBorder}"/>
+        <WindowChrome ResizeBorderThickness="{Binding ResizeBorder}"
+                      CaptionHeight="0" CornerRadius="0" GlassFrameThickness="0"
+                      UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
 
     <Window.Resources>

@@ -32,7 +32,7 @@ namespace Ruler
 
             StateChanged += (s, e) => WindowState = WindowState.Normal;
             Loaded += (s, e) => dispatcherTimer.Start();
-            SizeChanged += (s, e) => InvalidateVisual();
+            SizeChanged += MainWindow_SizeChanged;
             LocationChanged += MainWindow_LocationChanged;
 
             SourceInitialized += MainWindow_SourceInitialized;
@@ -65,29 +65,88 @@ namespace Ruler
         private void MainWindow_LocationChanged(object? sender, EventArgs e)
         {
             UpdateOrigin();
+            UpdateTooltip();
             InvalidateVisual();
+        }
+
+        private void MainWindow_SizeChanged(object? sender, EventArgs e)
+        {
+            UpdateTooltip();
+            InvalidateVisual();
+        }
+
+        private void UpdateTooltip()
+        {
+            viewModel.ScaleToolTip = $"Left: {Left}" + Environment.NewLine +
+                $"Top: {Top}";
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+            bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+            double offset = shift ? 5.0 : 0.5;
             switch (e.Key)
             {
                 case Key.Right:
-                    Left += ctrl ? 5 : 0.5;
-                    e.Handled = true;
+                    if (ctrl)
+                    {
+                        if (viewModel.Orientation == Orientation.Horizontal)
+                        {
+                            Width += offset;
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        Left += offset;
+                        e.Handled = true;
+                    }
                     break;
                 case Key.Left:
-                    Left -= ctrl ? 5 : 0.5;
-                    e.Handled = true;
+                    if (ctrl)
+                    {
+                        if (viewModel.Orientation == Orientation.Horizontal)
+                        {
+                            Width -= offset;
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        Left -= offset;
+                        e.Handled = true;
+                    }
                     break;
                 case Key.Up:
-                    Top -= ctrl ? 5 : 0.5;
-                    e.Handled = true;
+                    if (ctrl)
+                    {
+                        if (viewModel.Orientation == Orientation.Vertical)
+                        {
+                            Height -= offset;
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        Top -= offset;
+                        e.Handled = true;
+                    }
                     break;
                 case Key.Down:
-                    Top += ctrl ? 5 : 0.5;
-                    e.Handled = true;
+                    if (ctrl)
+                    {
+                        if (viewModel.Orientation == Orientation.Vertical)
+                        {
+                            Height += offset;
+                            e.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        Top += offset;
+                        e.Handled = true;
+                    }
                     break;
                 case Key.A:
                     viewModel.AngleVisible = !viewModel.AngleVisible;

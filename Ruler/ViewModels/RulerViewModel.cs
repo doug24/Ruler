@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -56,6 +57,9 @@ namespace Ruler
         private Edge activeEdge = Edge.Top;
 
         [ObservableProperty]
+        private string scaleToolTip = string.Empty;
+
+        [ObservableProperty]
         private bool angleVisible = false;
 
         [ObservableProperty]
@@ -90,17 +94,7 @@ namespace Ruler
 
                 // restore saved values for this orientation
                 RestoreCurrentLayout();
-
-                if (Orientation == Orientation.Horizontal)
-                {
-                    ResizeBorder = new Thickness(4, 0, 4, 0);
-                    ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
-                }
-                else if (Orientation == Orientation.Vertical)
-                {
-                    ResizeBorder = new Thickness(0, 4, 0, 4);
-                    ActiveEdge = Flip ? Edge.Left : Edge.Right;
-                }
+                SetBorderProperties();
             }
             else if (e.PropertyName == nameof(Flip))
             {
@@ -125,6 +119,7 @@ namespace Ruler
             MagnifierHeight = RulerSettings.Default.MagnifierHeight;
 
             RestoreCurrentLayout();
+            SetBorderProperties();
         }
 
         internal void SaveSettings()
@@ -157,6 +152,20 @@ namespace Ruler
             RulerSettings.CurrentLayout.Height = Height;
             RulerSettings.CurrentLayout.ZeroPoint = ZeroPoint;
             RulerSettings.CurrentLayout.Flip = Flip;
+        }
+
+        private void SetBorderProperties()
+        {
+            if (Orientation == Orientation.Horizontal)
+            {
+                ResizeBorder = new Thickness(4, 0, 4, 0);
+                ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
+            }
+            else if (Orientation == Orientation.Vertical)
+            {
+                ResizeBorder = new Thickness(0, 4, 0, 4);
+                ActiveEdge = Flip ? Edge.Left : Edge.Right;
+            }
         }
     }
 }
