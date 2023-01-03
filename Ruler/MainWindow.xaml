@@ -91,7 +91,8 @@
                 <MenuItem Header="Flip Scale" IsCheckable="True"
                           IsChecked="{Binding Flip, Mode=TwoWay}"
                           InputGestureText="S"/>
-                <MenuItem Header="Layout" Click="ShowLayoutDialog_Click"/>
+                <MenuItem Header="Layout" Click="ShowLayoutDialog_Click"
+                          InputGestureText="L"/>
                 <Separator/>
                 <MenuItem Header="Exit" Click="Exit_Click"
                           InputGestureText="Esc"/>
@@ -99,24 +100,16 @@
         </Grid.ContextMenu>
 
         <local:Scale x:Name="ruler"
-                     FontSize="12"
+                     FontFamily="{Binding FontFamily}"
+                     FontSize="{Binding FontSize}"
+                     MarkerFontSize="{Binding MarkerFontSize}"
+                     ColorTheme="{Binding ColorTheme}"
                      Orientation="{Binding Orientation}"
                      ScaleUnits="{Binding ScaleUnits}"
                      ZeroPoint="{Binding ZeroPoint}"
                      Flip="{Binding Flip}"
-                     TrackPoint="{Binding TrackPoint}"/>
-
-        <!--<Ellipse Fill="red" 
-                 Width="6"
-                 Height="6"
-                 HorizontalAlignment="Center" 
-                 VerticalAlignment="Center" />-->
-
-        <!--<TextBlock Text="{Binding ElementName=ruler, Path=ActualWidth}"
-                    FontSize="14"
-                    Margin="3"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"/>-->
+                     TrackPoint="{Binding TrackPoint}"
+                     Markers="{Binding Markers}"/>
 
     </Grid>
 

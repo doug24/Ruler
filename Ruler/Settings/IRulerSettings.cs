@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,6 +31,21 @@ namespace Ruler
         [DefaultValue(Theme.Light)]
         Theme ColorTheme { get; set; }
 
+        [DefaultValue("Segoe UI")]
+        string FontFamily { get; set; }
+
+        [DefaultValue(12d)]
+        double FontSize { get; set; }
+
+        [DefaultValue(12d)]
+        double MarkerFontSize { get; set; }
+
+        [DefaultValue(13d)]
+        double DialogFontSize { get; set; }
+
+        [DefaultValue("")]
+        string Markers { get; set; }
+
         ILayout HorizontalRuler { get; }
 
         ILayout VerticalRuler { get; }
@@ -59,6 +75,7 @@ namespace Ruler
     {
         SolidColorBrush Foreground { get; set; }
         SolidColorBrush Background { get; set; }
+        SolidColorBrush Mouse { get; set; }
         SolidColorBrush Marker { get; set; }
         SolidColorBrush Angle { get; set; }
         SolidColorBrush Info { get; set; }

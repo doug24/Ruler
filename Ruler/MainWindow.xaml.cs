@@ -66,13 +66,11 @@ namespace Ruler
         {
             UpdateOrigin();
             UpdateTooltip();
-            InvalidateVisual();
         }
 
         private void MainWindow_SizeChanged(object? sender, EventArgs e)
         {
             UpdateTooltip();
-            InvalidateVisual();
         }
 
         private void UpdateTooltip()
@@ -83,68 +81,92 @@ namespace Ruler
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+            bool alt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
             bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
             bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-            double offset = shift ? 5.0 : 0.5;
-            switch (e.Key)
+            double dipOffset = shift ? 5.0 : 0.5;
+            int pixelOffset = shift ? 10 : 1;
+
+            switch (key)
             {
                 case Key.Right:
                     if (ctrl)
                     {
+                        MoveCursor(pixelOffset, 0);
+                        e.Handled = true;
+                    }
+                    else if (alt)
+                    {
                         if (viewModel.Orientation == Orientation.Horizontal)
                         {
-                            Width += offset;
+                            Width += dipOffset;
                             e.Handled = true;
                         }
                     }
                     else
                     {
-                        Left += offset;
+                        Left += dipOffset;
                         e.Handled = true;
                     }
                     break;
                 case Key.Left:
                     if (ctrl)
                     {
+                        MoveCursor(-pixelOffset, 0);
+                        e.Handled = true;
+                    }
+                    else if (alt)
+                    {
                         if (viewModel.Orientation == Orientation.Horizontal)
                         {
-                            Width -= offset;
+                            Width -= dipOffset;
                             e.Handled = true;
                         }
                     }
                     else
                     {
-                        Left -= offset;
+                        Left -= dipOffset;
                         e.Handled = true;
                     }
                     break;
                 case Key.Up:
                     if (ctrl)
                     {
+                        MoveCursor(0, -pixelOffset);
+                        e.Handled = true;
+                    }
+                    else if (alt)
+                    {
                         if (viewModel.Orientation == Orientation.Vertical)
                         {
-                            Height -= offset;
+                            Height -= dipOffset;
                             e.Handled = true;
                         }
                     }
                     else
                     {
-                        Top -= offset;
+                        Top -= dipOffset;
                         e.Handled = true;
                     }
                     break;
                 case Key.Down:
                     if (ctrl)
                     {
+                        MoveCursor(0, pixelOffset);
+                        e.Handled = true;
+                    }
+                    else if (alt)
+                    {
                         if (viewModel.Orientation == Orientation.Vertical)
                         {
-                            Height += offset;
+                            Height += dipOffset;
                             e.Handled = true;
                         }
                     }
                     else
                     {
-                        Top += offset;
+                        Top += dipOffset;
                         e.Handled = true;
                     }
                     break;
@@ -200,10 +222,35 @@ namespace Ruler
                     viewModel.ScaleUnits = Units.Percent;
                     e.Handled = true;
                     break;
+                case Key.M:
+                    viewModel.SetMarker();
+                    e.Handled|= true;
+                    break;
+                case Key.D:
+                    viewModel.RemoveMarker();
+                    e.Handled|= true;
+                    break;
+                case Key.C:
+                    viewModel.ClearMarkers();
+                    e.Handled|= true;
+                    break;
+                case Key.L:
+                    ShowLayoutDialog_Click(sender, e);
+                    e.Handled|= true;
+                    break;
                 case Key.Escape:
                     Exit_Click(sender, new());
                     e.Handled = true;
                     break;
+            }
+        }
+
+        private static void MoveCursor(int xOffset, int yOffset)
+        {
+            POINT mousePoint = new();
+            if (GetCursorPos(ref mousePoint))
+            {
+                SetCursorPos(mousePoint.X + xOffset, mousePoint.Y + yOffset);
             }
         }
 

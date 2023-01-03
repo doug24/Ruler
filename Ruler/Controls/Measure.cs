@@ -155,6 +155,25 @@ namespace Ruler
             DependencyProperty.Register("TrackPoint", typeof(Point), typeof(Measure),
             new FrameworkPropertyMetadata(new Point(), FrameworkPropertyMetadataOptions.AffectsRender));
 
+        public Theme ColorTheme
+        {
+            get { return (Theme)GetValue(ColorThemeProperty); }
+            set { SetValue(ColorThemeProperty, value); }
+        }
+
+        public static readonly DependencyProperty ColorThemeProperty =
+            DependencyProperty.Register("ColorTheme", typeof(Theme), typeof(Measure),
+            new FrameworkPropertyMetadata(Theme.Light, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public double MarkerFontSize
+        {
+            get { return (double)GetValue(MarkerFontSizeProperty); }
+            set { SetValue(MarkerFontSizeProperty, value); }
+        }
+
+        public static readonly DependencyProperty MarkerFontSizeProperty =
+            DependencyProperty.Register("MarkerFontSize", typeof(double), typeof(Measure),
+            new FrameworkPropertyMetadata(12d, FrameworkPropertyMetadataOptions.AffectsRender));
 
         protected void Drawline(DrawingContext dc, Pen pen,
             double location, double length, Orientation orientation)
@@ -184,11 +203,11 @@ namespace Ruler
 
         protected Typeface Typeface => new(FontFamily, FontStyle, FontWeight, FontStretch);
 
-        protected FormattedText FormatText(double num)
+        protected FormattedText FormatText(double num, double fontSize)
         {
             if (ScaleUnits == Units.Inch)
             {
-                return FormatFraction(num, 32, RulerSettings.CurrentTheme.Foreground);
+                return FormatFraction(num, 32, fontSize, RulerSettings.CurrentTheme.Foreground);
             }
             else if (ScaleUnits == Units.CM)
             {
@@ -198,14 +217,14 @@ namespace Ruler
             {
                 num = Math.Round(num, 1);
             }
-            return FormatText(num.ToString());
+            return FormatText(num.ToString(), fontSize);
         }
 
-        protected FormattedText FormatText(double num, Brush foreground)
+        protected FormattedText FormatText(double num, double fontSize, Brush foreground)
         {
             if (ScaleUnits == Units.Inch)
             {
-                return FormatFraction(num, 32, foreground);
+                return FormatFraction(num, 32, fontSize, foreground);
             }
             else if (ScaleUnits == Units.CM)
             {
@@ -215,26 +234,26 @@ namespace Ruler
             {
                 num = Math.Round(num, 1);
             }
-            return FormatText(num.ToString(), foreground);
+            return FormatText(num.ToString(), fontSize, foreground);
         }
 
-        protected FormattedText FormatText(string text)
+        protected FormattedText FormatText(string text, double fontSize)
         {
-            return FormatText(text, RulerSettings.CurrentTheme.Foreground);
+            return FormatText(text, fontSize, RulerSettings.CurrentTheme.Foreground);
         }
 
-        protected FormattedText FormatText(string text, Brush foreground)
+        protected FormattedText FormatText(string text, double fontSize, Brush foreground)
         {
             return new(text,
                 CultureInfo.CurrentCulture,
                 FlowDirection,
                 Typeface,
-                FontSize,
+                fontSize,
                 foreground,
                 VisualTreeHelper.GetDpi(this).PixelsPerDip);
         }
 
-        protected FormattedText FormatFraction(double num, int maxDenominator, Brush foreground)
+        protected FormattedText FormatFraction(double num, int maxDenominator, double fontSize, Brush foreground)
         {
             // Calculating the nearest increment of the value
             // argument based on the denominator argument.
@@ -249,7 +268,7 @@ namespace Ruler
             // Checking for the whole number case and returning if found.
             if (remainder == 0.0)
             {
-                return FormatText(wholeValue.ToString(), foreground);
+                return FormatText(wholeValue.ToString(), fontSize, foreground);
             }
 
             string sign = Math.Sign(remainder) == -1 ? "-" : string.Empty;
@@ -278,12 +297,12 @@ namespace Ruler
                         Numerator(Math.Abs(numerator)) +
                         char.ConvertFromUtf32(0x2044) +
                         Denominators[(int)denominator],
-                        foreground);
+                        fontSize, foreground);
                 }
             }
 
             // Returns Error if something goes wrong.
-            return FormatText("Error", foreground);
+            return FormatText("Error", fontSize, foreground);
         }
 
         protected static bool Modulo(double a, double b, double maxdelta = 0.5)

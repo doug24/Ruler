@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,13 +16,49 @@ namespace Ruler
         private Rect hotSpot = new(0, 0, 20, 80);
         private Orientation? previous = null;
         private readonly ToolTip toolTip = new();
-        private readonly DispatcherTimer timer = new DispatcherTimer();
+        private readonly DispatcherTimer timer = new();
 
         static Scale()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Scale),
                 new FrameworkPropertyMetadata(typeof(Scale)));
         }
+
+        public static readonly DependencyProperty MarkersProperty =
+            DependencyProperty.Register(
+                "Markers", typeof(IEnumerable<double>), typeof(Scale),
+                new PropertyMetadata(Array.Empty<double>(), MarkersPropertyChanged));
+
+        public IEnumerable<double> Markers
+        {
+            get { return (IEnumerable<double>)GetValue(MarkersProperty); }
+            set { SetValue(MarkersProperty, value); }
+        }
+
+        private static void MarkersPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            if (obj is Scale control)
+            {
+                if (e.OldValue is INotifyCollectionChanged oldCollection)
+                {
+                    oldCollection.CollectionChanged -= control.MarkersCollectionChanged;
+                }
+
+                if (e.NewValue is INotifyCollectionChanged newCollection)
+                {
+                    newCollection.CollectionChanged += control.MarkersCollectionChanged;
+                }
+
+                control?.InvalidateVisual();
+            }
+        }
+
+        private void MarkersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            // optionally take e.Action into account
+            InvalidateVisual();
+        }
+
 
         public Scale()
         {
@@ -38,8 +77,10 @@ namespace Ruler
             Window parent = Window.GetWindow(this);
             if (parent != null)
             {
-                Binding binding = new("ScaleToolTip");
-                binding.Source = parent.DataContext;
+                Binding binding = new("ScaleToolTip")
+                {
+                    Source = parent.DataContext
+                };
                 toolTip.SetBinding(ContentControl.ContentProperty, binding);
 
                 parent.Closing += (s, e) =>
@@ -123,6 +164,7 @@ namespace Ruler
         {
             var width = ActualWidth;
             var height = ActualHeight;
+            double textHeight = 0;
 
             var tm = tickMap[ScaleUnits];
             double unitsSize = DipConverter.Convert(width, ScaleUnits, Orientation.Horizontal);
@@ -145,7 +187,8 @@ namespace Ruler
                 {
                     double dip = DipConverter.ToDIP(unit, width,
                         ZeroPoint, ScaleUnits, Orientation.Horizontal);
-                    var label = FormatText(unit);
+                    var label = FormatText(unit, FontSize);
+                    textHeight = label.Height;
                     double x = Math.Max(1, Math.Min(dip - label.Width / 2, width - label.Width - 1));
                     double y = Flip ? height - label.Height - 32 : 32;
                     dc.DrawText(label, new(x, y));
@@ -154,23 +197,33 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.X <= width, in Dips
-            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
+            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Mouse, onePixelInDip), TrackPoint.X, height, Orientation.Horizontal);
 
-            double tx = DipConverter.ToDIP(TrackPoint.X, width,
+            double tpx = DipConverter.ToDIP(TrackPoint.X, width,
                 ZeroPoint, Units.DIP, Orientation.Horizontal);
-            double txInUnits = DipConverter.Convert(tx, ScaleUnits, Orientation.Horizontal);
-            var xmarker = FormatText(txInUnits, RulerSettings.CurrentTheme.Marker);
+            double tpxInUnits = DipConverter.Convert(tpx, ScaleUnits, Orientation.Horizontal);
+            var tpxText = FormatText(tpxInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
 
-            var xpos1 = TrackPoint.X - xmarker.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - xmarker.Width - 6;
-            var ypos1 = Flip ? xmarker.Height + 2 : height - 2 * xmarker.Height;
+            var xpos = TrackPoint.X - tpxText.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - tpxText.Width - 6;
+            var ypos = Flip ? height - tpxText.Height - textHeight - 32 : 32 + textHeight;
+            textHeight += tpxText.Height;
 
-            dc.DrawText(xmarker, new(xpos1, ypos1));
+            dc.DrawText(tpxText, new(xpos, ypos));
 
-            //Window w = Window.GetWindow(this);
-            //var t1 = w != null ? FormatText(w.Left) : FormatText(0);
-            //dc.DrawText(t1, new Point(1, height - t1.Height));
-            //var t2 = w != null ? FormatText(w.Left + w.ActualWidth) : FormatText(width);
-            //dc.DrawText(t2, new Point(width - t2.Width - 1, height - t1.Height));
+            // Markers
+            foreach (double marker in Markers)
+            {
+                if (marker > 0 && marker <= width)
+                {
+                    Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), marker, height, Orientation.Horizontal);
+
+                    double markerInUnits = DipConverter.Convert(marker, ScaleUnits, Orientation.Horizontal);
+                    var markerText = FormatText(markerInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Marker);
+                    var xmkr = marker - markerText.Width - 6 < 0 ? marker + 1 : marker - markerText.Width - 6;
+                    var yMkr = Flip ? height - markerText.Height - textHeight - 32 : 32 + textHeight;
+                    dc.DrawText(markerText, new(xmkr, yMkr));
+                }
+            }
         }
 
         private void RenderVerticalScale(DrawingContext dc, Pen foregroundPen)
@@ -199,7 +252,7 @@ namespace Ruler
                 {
                     double dip = DipConverter.ToDIP(unit, height,
                         ZeroPoint, ScaleUnits, Orientation.Vertical);
-                    var label = FormatText(unit);
+                    var label = FormatText(unit, FontSize);
                     double x = Flip ? 20 : width - label.Width - 20;
                     double y = Math.Max(0, Math.Min(dip - label.Height / 2, height - label.Height));
                     dc.DrawText(label, new(x, y));
@@ -208,18 +261,34 @@ namespace Ruler
 
             // Mouse track point marker
             // 0 <= TrackPoint.Y <= height, in DIPs
-            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
+            Drawline(dc, new Pen(RulerSettings.CurrentTheme.Mouse, onePixelInDip), TrackPoint.Y, width, Orientation.Vertical);
 
             double ty = DipConverter.ToDIP(TrackPoint.Y, height,
                 ZeroPoint, Units.DIP, Orientation.Vertical);
             double tyInUnits = DipConverter.Convert(ty, ScaleUnits, Orientation.Vertical);
-            var ymarker = FormatText(tyInUnits, RulerSettings.CurrentTheme.Marker);
+            var ymarker = FormatText(tyInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
 
             var xpos = Flip ? width - ymarker.Width - 4 : 4;
-            var ypos1 = TrackPoint.Y - ymarker.Height - 1 < 0 ?
+            var ypos = TrackPoint.Y - ymarker.Height - 1 < 0 ?
                 TrackPoint.Y + 1 : TrackPoint.Y - ymarker.Height - 1;
 
-            dc.DrawText(ymarker, new(xpos, ypos1));
+            dc.DrawText(ymarker, new(xpos, ypos));
+
+            // Markers
+            foreach (double marker in Markers)
+            {
+                if (marker > 0 && marker <= height)
+                {
+                    Drawline(dc, new Pen(RulerSettings.CurrentTheme.Marker, onePixelInDip), marker, width, Orientation.Vertical);
+
+                    double markerInUnits = DipConverter.Convert(marker, ScaleUnits, Orientation.Vertical);
+                    var markerText = FormatText(markerInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Marker);
+                    var xmkr = Flip ? width - markerText.Width - 4 : 4;
+                    var yMkr = marker - markerText.Height - 1 < 0 ?
+                        marker + 1 : marker - markerText.Height - 1;
+                    dc.DrawText(markerText, new(xmkr, yMkr));
+                }
+            }
         }
     }
 }

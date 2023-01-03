@@ -57,7 +57,8 @@ namespace Ruler
         {
             Foreground = Brushes.White,
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF202020")),
-            Marker = Brushes.LightGreen,
+            Mouse = Brushes.LightGreen,
+            Marker = Brushes.Violet,
             Angle = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600")),
             Info = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF606060")),
         };
@@ -71,13 +72,15 @@ namespace Ruler
         {
             Foreground = Brushes.Black;
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
-            Marker = Brushes.ForestGreen;
+            Mouse = Brushes.ForestGreen;
+            Marker = Brushes.DarkMagenta;
             Angle = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF6600"));
             Info = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
         }
 
         public SolidColorBrush Foreground { get; set; }
         public SolidColorBrush Background { get; set; }
+        public SolidColorBrush Mouse { get; set; }
         public SolidColorBrush Marker { get; set; }
         public SolidColorBrush Angle { get; set; }
         public SolidColorBrush Info { get; set; }

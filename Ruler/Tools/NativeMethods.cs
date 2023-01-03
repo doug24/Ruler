@@ -30,6 +30,9 @@ namespace Ruler
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetCursorPos(ref POINT pt);
 
+        [DllImport("User32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern bool SetCursorPos(int X, int Y);
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool InvalidateRect(IntPtr hWnd, IntPtr rect, [MarshalAs(UnmanagedType.Bool)] bool erase);

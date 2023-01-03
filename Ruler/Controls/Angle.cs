@@ -58,8 +58,8 @@ namespace Ruler
             Pen foregroundPen = new(RulerSettings.CurrentTheme.Foreground, 1);
             foregroundPen.Freeze();
 
-            Pen markerPen = new(RulerSettings.CurrentTheme.Marker, onePixelInDip);
-            markerPen.Freeze();
+            Pen mousePen = new(RulerSettings.CurrentTheme.Mouse, onePixelInDip);
+            mousePen.Freeze();
 
             SolidColorBrush transparentBrush = new()
             {
@@ -95,12 +95,12 @@ namespace Ruler
             {
                 Point pt = Orientation == Orientation.Horizontal ?
                     new(MousePoint.X, Origin.Y) : new(Origin.X, MousePoint.Y);
-                dc.DrawLine(markerPen, pt, MousePoint);
+                dc.DrawLine(mousePen, pt, MousePoint);
 
                 // perpendicular offset text
                 double offset = Orientation == Orientation.Horizontal ? TrackPoint.Y : TrackPoint.X;
                 double offsetInUnits = DipConverter.Convert(offset, ScaleUnits, Orientation);
-                var offsetMarker = FormatText(offsetInUnits, RulerSettings.CurrentTheme.Marker);
+                var offsetMarker = FormatText(offsetInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
                 Point markerPoint = Orientation == Orientation.Horizontal ?
                     new(MousePoint.X + 6, (MousePoint.Y + Origin.Y) / 2) :
                     new((MousePoint.X + Origin.X) / 2, MousePoint.Y + 6);
@@ -248,7 +248,8 @@ namespace Ruler
                 }
             }
 
-            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0), RulerSettings.CurrentTheme.Foreground);
+            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0), 
+                MarkerFontSize, RulerSettings.CurrentTheme.Foreground);
             textOrigin = DrawingExtensions.GetEndPointOnRadus(Origin, radius + 12,
                 startDegrees, sweepDegrees / 2, sweepDirection);
             textOrigin.Offset(textOffset ? -label.Width : 0, -label.Height / 2);

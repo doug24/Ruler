@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Ruler
@@ -77,6 +82,90 @@ namespace Ruler
         [ObservableProperty]
         private float magnification = 1.6f;
 
+        [ObservableProperty]
+        private bool useDefaultFont = true;
+
+        [ObservableProperty]
+        private string fontFamily = "Segoe UI";
+
+        [ObservableProperty]
+        private double fontSize = 12.0;
+
+        [ObservableProperty]
+        private double markerFontSize = 12.0;
+
+        [ObservableProperty]
+        private double dialogFontSize = 13.0;
+
+        public Theme ColorTheme
+        {
+            get { return RulerSettings.Default.ColorTheme; }
+            set
+            {
+                SetProperty(RulerSettings.Default.ColorTheme, value, RulerSettings.Default,
+                    (s, t) => s.ColorTheme = t);
+            }
+        }
+        public IList<FontInfo> FontFamilies
+        {
+            get { return Fonts.SystemFontFamilies.Select(r => new FontInfo(r.Source)).OrderBy(f => f.FamilyName).ToList(); }
+        }
+
+        public ObservableCollection<double> Markers { get; set; } = new();
+
+        internal void SetMarker()
+        {
+            if (Orientation == Orientation.Horizontal)
+            {
+                if (!Markers.Contains(TrackPoint.X))
+                {
+                    Markers.Add(TrackPoint.X);
+                }
+            }
+            else
+            {
+                if (!Markers.Contains(TrackPoint.Y))
+                {
+                    Markers.Add(TrackPoint.Y);
+                }
+            }
+        }
+
+        internal void RemoveMarker()
+        {
+            List<double> toRemove = new();
+            if (Orientation == Orientation.Horizontal)
+            {
+                foreach (var marker in Markers)
+                {
+                    if (Math.Abs(marker - TrackPoint.X) <= 1)
+                    {
+                        toRemove.Add(marker);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var marker in Markers)
+                {
+                    if (Math.Abs(marker - TrackPoint.Y) <= 1)
+                    {
+                        toRemove.Add(marker);
+                    }
+                }
+            }
+
+            foreach (var rem in toRemove)
+            {
+                Markers.Remove(rem);
+            }
+        }
+
+        internal void ClearMarkers()
+        {
+            Markers.Clear();
+        }
+
         private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
             // save current layout values before changing
@@ -117,6 +206,19 @@ namespace Ruler
             Perpendicular = RulerSettings.Default.Perpendicular;
             MagnifierWidth = RulerSettings.Default.MagnifierWidth;
             MagnifierHeight = RulerSettings.Default.MagnifierHeight;
+            FontFamily = RulerSettings.Default.FontFamily;
+            FontSize= RulerSettings.Default.FontSize;
+            MarkerFontSize= RulerSettings.Default.MarkerFontSize;
+            DialogFontSize= RulerSettings.Default.DialogFontSize;
+
+            var parts = RulerSettings.Default.Markers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var num in parts)
+            {
+                if (double.TryParse(num, out var value))
+                {
+                    Markers.Add(value);
+                }
+            }
 
             RestoreCurrentLayout();
             SetBorderProperties();
@@ -130,6 +232,11 @@ namespace Ruler
             RulerSettings.Default.Perpendicular = Perpendicular;
             RulerSettings.Default.MagnifierWidth = MagnifierWidth;
             RulerSettings.Default.MagnifierHeight = MagnifierHeight;
+            RulerSettings.Default.FontFamily = FontFamily;
+            RulerSettings.Default.FontSize = FontSize;
+            RulerSettings.Default.MarkerFontSize = MarkerFontSize;
+            RulerSettings.Default.DialogFontSize = DialogFontSize;
+            RulerSettings.Default.Markers = string.Join(",", Markers);
 
             SaveCurrentLayout();
         }
@@ -166,6 +273,32 @@ namespace Ruler
                 ResizeBorder = new Thickness(0, 4, 0, 4);
                 ActiveEdge = Flip ? Edge.Left : Edge.Right;
             }
+        }
+    }
+
+    public class FontInfo
+    {
+        public FontInfo(string familyName)
+        {
+            FamilyName = familyName;
+            IsMonospaced = GetIsMonospaced(familyName);
+        }
+        public string FamilyName { get; private set; }
+        public bool IsMonospaced { get; private set; }
+
+        private static bool GetIsMonospaced(string familyName)
+        {
+            Typeface typeface = new(new FontFamily(familyName), SystemFonts.MessageFontStyle,
+                SystemFonts.MessageFontWeight, FontStretches.Normal);
+
+            FormattedText narrowChar = new("i", CultureInfo.CurrentCulture,
+                CultureInfo.CurrentCulture.TextInfo.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+                typeface, 12, Brushes.Black, null, 1);
+            FormattedText wideChar = new("w", CultureInfo.CurrentCulture,
+                CultureInfo.CurrentCulture.TextInfo.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+                typeface, 12, Brushes.Black, null, 1);
+
+            return narrowChar.Width == wideChar.Width;
         }
     }
 }

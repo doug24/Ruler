@@ -15,7 +15,9 @@
         d:DesignWidth="80"
         d:DesignHeight="80">
 
-    <local:Angle FontSize="12"
+    <local:Angle FontFamily="{Binding FontFamily}"
+                 FontSize="{Binding FontSize}"
+                 MarkerFontSize="{Binding MarkerFontSize}"
                  Origin="{Binding Origin}"
                  MousePoint="{Binding MousePoint}"
                  TrackPoint="{Binding TrackPoint}"
