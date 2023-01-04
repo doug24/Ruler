@@ -20,6 +20,7 @@ namespace Ruler
         private SizeToolsWindow? optionsDialog;
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
+        private double leftRestore = double.NaN, topRestore = double.NaN, widthRestore = 20, heightRestore = 20;
 
         public MainWindow()
         {
@@ -30,7 +31,6 @@ namespace Ruler
             dispatcherTimer = new(TimeSpan.FromMilliseconds(50),
                 DispatcherPriority.Render, TimerCallback, Dispatcher);
 
-            StateChanged += (s, e) => WindowState = WindowState.Normal;
             Loaded += (s, e) => dispatcherTimer.Start();
             SizeChanged += MainWindow_SizeChanged;
             LocationChanged += MainWindow_LocationChanged;
@@ -238,10 +238,55 @@ namespace Ruler
                     ShowLayoutDialog_Click(sender, e);
                     e.Handled = true;
                     break;
+                case Key.OemMinus:
+                    WindowState = WindowState.Minimized;
+                    e.Handled = true;
+                    break;
+                case Key.OemPlus:
+                    MaximizeRestore();
+                    e.Handled = true;
+                    break;
                 case Key.Escape:
                     Exit_Click(sender, new());
                     e.Handled = true;
                     break;
+            }
+        }
+
+        private void MaximizeRestore()
+        {
+            Screen screen = Screen.FromWindow(this);
+            if (viewModel.Orientation == Orientation.Horizontal)
+            {
+                if (!double.IsNaN(leftRestore))
+                {
+                    Left = leftRestore;
+                    Width = widthRestore;
+                    leftRestore = double.NaN;
+                }
+                else
+                {
+                    leftRestore = Left;
+                    widthRestore = ActualWidth;
+                    Left = 0;
+                    Width = screen.WorkingAreaDip.Width;
+                }
+            }
+            else
+            {
+                if (!double.IsNaN(topRestore))
+                {
+                    Top = topRestore;
+                    Height = heightRestore;
+                    topRestore = double.NaN;
+                }
+                else
+                {
+                    topRestore = Top;
+                    heightRestore = ActualHeight;
+                    Top = 0;
+                    Height = screen.WorkingAreaDip.Height;
+                }
             }
         }
 
