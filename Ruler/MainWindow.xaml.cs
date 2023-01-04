@@ -21,6 +21,7 @@ namespace Ruler
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
         private double leftRestore = double.NaN, topRestore = double.NaN, widthRestore = 20, heightRestore = 20;
+        private double minDip = 1d;
 
         public MainWindow()
         {
@@ -31,7 +32,7 @@ namespace Ruler
             dispatcherTimer = new(TimeSpan.FromMilliseconds(50),
                 DispatcherPriority.Render, TimerCallback, Dispatcher);
 
-            Loaded += (s, e) => dispatcherTimer.Start();
+            Loaded += MainWindow_Loaded;
             SizeChanged += MainWindow_SizeChanged;
             LocationChanged += MainWindow_LocationChanged;
 
@@ -42,6 +43,14 @@ namespace Ruler
             ruler.PreviewMouseDown += Ruler_PreviewMouseDown;
 
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        private void MainWindow_Loaded(object? sender, RoutedEventArgs e)
+        {
+            Screen scr = Screen.FromWindow(this);
+            minDip = 1.0 / scr.ScaleX;
+
+            dispatcherTimer.Start();
         }
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -64,6 +73,9 @@ namespace Ruler
 
         private void MainWindow_LocationChanged(object? sender, EventArgs e)
         {
+            Screen scr = Screen.FromWindow(this);
+            minDip = 1.0 / scr.ScaleX;
+
             UpdateOrigin();
             UpdateTooltip();
         }
@@ -85,7 +97,7 @@ namespace Ruler
             bool alt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
             bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
             bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-            double dipOffset = shift ? 5.0 : 0.5;
+            double dipOffset = shift ? 10 * minDip : minDip;
             int pixelOffset = shift ? 10 : 1;
 
             switch (key)
