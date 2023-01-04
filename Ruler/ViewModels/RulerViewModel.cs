@@ -236,7 +236,7 @@ namespace Ruler
             var parts = RulerSettings.Default.Markers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var num in parts)
             {
-                if (double.TryParse(num, out var value))
+                if (double.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
                 {
                     Markers.Add(value);
                 }
@@ -260,7 +260,7 @@ namespace Ruler
             RulerSettings.Default.DialogFontSize = DialogFontSize;
             RulerSettings.Default.Opacity = Opacity;
             RulerSettings.Default.TopMost = TopMost;
-            RulerSettings.Default.Markers = string.Join(",", Markers);
+            RulerSettings.Default.Markers = string.Join(",", Markers.Select(m => m.ToString("G", CultureInfo.InvariantCulture)));
 
             SaveCurrentLayout();
         }
