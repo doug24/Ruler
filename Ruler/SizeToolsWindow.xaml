@@ -26,23 +26,26 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Margin="3,3,3,0" Header="Orientation">
-            <StackPanel Orientation="Horizontal">
-                <RadioButton Content="Horizontal" Margin="3" GroupName="Style"
+        <Grid Grid.Row="0" Margin="3,3,3,0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="0" Header="Orientation">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Horizontal" Margin="3" GroupName="Style"
                          IsChecked="{Binding Orientation, 
                             Converter={StaticResource enumBool}, ConverterParameter=Horizontal}"/>
-                <RadioButton Content="Vertical" Margin="3" GroupName="Style"
+                    <RadioButton Content="Vertical" Margin="3" GroupName="Style"
                          IsChecked="{Binding Orientation, 
                             Converter={StaticResource enumBool}, ConverterParameter=Vertical}"/>
-            </StackPanel>
-        </GroupBox>
-
-        <UniformGrid Grid.Row="1" Rows="1">
-            <GroupBox Margin="3,0" Header="Zero Point">
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="1" Margin="3,0" Header="Zero Point">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton Content="Near" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
@@ -52,11 +55,40 @@
                                     Converter={StaticResource enumBool}, ConverterParameter=Far}"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Margin="3,0" Header="Scale">
-                <CheckBox Content="Flip" Margin="3"
-                          IsChecked="{Binding Flip}"/>
+            <GroupBox Grid.Column="2" Margin="3,0" Header="Scale">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Content="Flip" Margin="3"
+                              IsChecked="{Binding Flip}"/>
+                    <CheckBox Content="Thin scale" Margin="3"
+                              IsChecked="{Binding ThinScale}"/>
+                </StackPanel>
             </GroupBox>
-        </UniformGrid>
+        </Grid>
+
+        <GroupBox Grid.Row="1" Margin="3,0" Header="Window">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Content="Has Borders" Margin="3"
+                                  IsChecked="{Binding ShowBorders}"/>
+                    <CheckBox Content="Always on top" Margin="8,3,3,3"
+                                IsChecked="{Binding TopMost}"/>
+                </StackPanel>
+                <DockPanel LastChildFill="True">
+                    <Label Content="Opacity" Margin="3"/>
+                    <Slider VerticalAlignment="Center" 
+                        Value="{Binding Opacity}"
+                        Minimum="0.1"
+                        Maximum="1.0"
+                        TickFrequency=".1"
+                        LargeChange=".1"
+                        IsSnapToTickEnabled="True" 
+                        AutoToolTipPlacement="TopLeft"
+                        AutoToolTipPrecision="1" />
+
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+
 
         <GroupBox Grid.Row="2" Margin="3,0" Header="Units">
             <StackPanel Orientation="Horizontal">
@@ -81,25 +113,8 @@
             </StackPanel>
         </GroupBox>
 
-        <UniformGrid Grid.Row="3" Rows="1">
-            <GroupBox Margin="3,0" Header="Opacity">
-                <Slider VerticalAlignment="Center"
-                        Value="{Binding Opacity}"
-                        Minimum="0.1"
-                        Maximum="1.0"
-                        TickFrequency=".1"
-                        LargeChange=".1"
-                        IsSnapToTickEnabled="True" 
-                        AutoToolTipPlacement="TopLeft"
-                        AutoToolTipPrecision="1" />
-            </GroupBox>
-            <GroupBox Margin="3,0" Header="Window">
-                <CheckBox Content="Always on top"
-                          IsChecked="{Binding TopMost}"/>
-            </GroupBox>
-        </UniformGrid>
 
-        <GroupBox Grid.Row="4" Margin="3,0" Header="Color Theme">
+        <GroupBox Grid.Row="3" Margin="3,0" Header="Color Theme">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Light" Margin="3" GroupName="Color"
                          IsChecked="{Binding ColorTheme, 
@@ -112,7 +127,9 @@
                             Converter={StaticResource enumBool}, ConverterParameter=Custom, Mode=TwoWay}"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="5" Margin="3,0" Header="Fonts">
+        
+        
+        <GroupBox Grid.Row="4" Margin="3,0" Header="Fonts">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -199,7 +216,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="7" Margin="3,0" Header="Magnifier">
+        <GroupBox Grid.Row="5" Margin="3,0" Header="Magnifier">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Grid.Row="1" Grid.Column="0" Content="Width" Margin="3,0" />

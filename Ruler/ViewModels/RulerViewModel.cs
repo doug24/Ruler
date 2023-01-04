@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -62,6 +63,9 @@ namespace Ruler
         private bool flip = false;
 
         [ObservableProperty]
+        private bool thinScale = false;
+
+        [ObservableProperty]
         private Edge activeEdge = Edge.Top;
 
         [ObservableProperty]
@@ -104,6 +108,9 @@ namespace Ruler
         private double opacity = 1;
 
         [ObservableProperty]
+        private bool showBorders = true;
+
+        [ObservableProperty]
         private bool topMost = false;
 
         public Theme ColorTheme
@@ -115,10 +122,16 @@ namespace Ruler
                     (s, t) => s.ColorTheme = t);
             }
         }
-        public IList<FontInfo> FontFamilies
-        {
-            get { return Fonts.SystemFontFamilies.Select(r => new FontInfo(r.Source)).OrderBy(f => f.FamilyName).ToList(); }
-        }
+
+        public ICommand SetMarkerCommand => new RelayCommand(
+            p => SetMarker());
+
+        public ICommand RemoveMarkerCommand => new RelayCommand(
+            p => RemoveMarker());
+
+        public ICommand ClearMarkersCommand => new RelayCommand(
+            p => ClearMarkers());
+
 
         public ObservableCollection<double> Markers { get; set; } = new();
 
@@ -173,6 +186,11 @@ namespace Ruler
         internal void ClearMarkers()
         {
             Markers.Clear();
+        }
+
+        public IList<FontInfo> FontFamilies
+        {
+            get { return Fonts.SystemFontFamilies.Select(r => new FontInfo(r.Source)).OrderBy(f => f.FamilyName).ToList(); }
         }
 
         private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
@@ -231,6 +249,8 @@ namespace Ruler
             MarkerFontSize = RulerSettings.Default.MarkerFontSize;
             DialogFontSize = RulerSettings.Default.DialogFontSize;
             Opacity = RulerSettings.Default.Opacity;
+            ShowBorders = RulerSettings.Default.ShowBorders;
+            ThinScale = RulerSettings.Default.ThinScale;
             TopMost = RulerSettings.Default.TopMost;
 
             var parts = RulerSettings.Default.Markers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -259,6 +279,8 @@ namespace Ruler
             RulerSettings.Default.MarkerFontSize = MarkerFontSize;
             RulerSettings.Default.DialogFontSize = DialogFontSize;
             RulerSettings.Default.Opacity = Opacity;
+            RulerSettings.Default.ShowBorders = ShowBorders;
+            RulerSettings.Default.ThinScale = ThinScale;
             RulerSettings.Default.TopMost = TopMost;
             RulerSettings.Default.Markers = string.Join(",", Markers.Select(m => m.ToString("G", CultureInfo.InvariantCulture)));
 

@@ -33,6 +33,29 @@ namespace Ruler
             DependencyProperty.Register("ShortAxis", typeof(double), typeof(Scale),
             new FrameworkPropertyMetadata(80d, FrameworkPropertyMetadataOptions.AffectsParentMeasure));
 
+
+        public bool ThinScale
+        {
+            get { return (bool)GetValue(ThinScaleProperty); }
+            set { SetValue(ThinScaleProperty, value); }
+        }
+
+        public static readonly DependencyProperty ThinScaleProperty =
+            DependencyProperty.Register("ThinScale", typeof(bool), typeof(Scale),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+
+        public bool ShowBorders
+        {
+            get { return (bool)GetValue(ShowBordersProperty); }
+            set { SetValue(ShowBordersProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowBordersProperty =
+            DependencyProperty.Register("ShowBorders", typeof(bool), typeof(Scale),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
         public static readonly DependencyProperty MarkersProperty =
             DependencyProperty.Register(
                 "Markers", typeof(IEnumerable<double>), typeof(Scale),
@@ -130,10 +153,19 @@ namespace Ruler
             if (Orientation == Orientation.Horizontal)
             {
                 double height = 32;
-                var ft = FormatText(100, FontSize);
-                height += ft.Height;
-                ft = FormatText(100, MarkerFontSize);
-                height += 2 * ft.Height;
+                if (ThinScale)
+                {
+                    height = 16;
+                    var ft = FormatText(100, Math.Max(FontSize, MarkerFontSize));
+                    height += ft.Height;
+                }
+                else
+                {
+                    var ft = FormatText(100, FontSize);
+                    height += ft.Height;
+                    ft = FormatText(100, MarkerFontSize);
+                    height += 2 * ft.Height;
+                }
                 height = Math.Round(height + 0.5, 0);
                 ShortAxis = height;
                 return new(constraint.Width, height);
@@ -141,10 +173,19 @@ namespace Ruler
             else
             {
                 double width = 16;
-                var ft = FormatText(1234, FontSize);
-                width += ft.Width;
-                ft = FormatText(1234.5, MarkerFontSize);
-                width += ft.Width;
+                if (ThinScale)
+                {
+                    width = 12;
+                    var ft = FormatText(1234, Math.Max(FontSize, MarkerFontSize));
+                    width += ft.Width;
+                }
+                else
+                {
+                    var ft = FormatText(1234, FontSize);
+                    width += ft.Width;
+                    ft = FormatText(1234.5, MarkerFontSize);
+                    width += ft.Width;
+                }
                 width = Math.Round(width + 0.5, 0);
                 ShortAxis = width;
                 return new(width, constraint.Height);
@@ -190,10 +231,15 @@ namespace Ruler
             var width = ActualWidth;
             var height = ActualHeight;
 
-            dc.DrawRectangle(RulerSettings.CurrentTheme.Background, foregroundPen,
+            var borderPen = ShowBorders ? foregroundPen : null;
+
+            dc.DrawRectangle(RulerSettings.CurrentTheme.Background, borderPen,
                 new(new Point(0, 0), new Size(ActualWidth, ActualHeight)));
-            dc.DrawLine(foregroundPen, new Point(0, 0.5), new Point(width, 0.5));
-            dc.DrawLine(foregroundPen, new Point(0.5, 0), new Point(0.5, height));
+            if (ShowBorders)
+            {
+                dc.DrawLine(foregroundPen, new Point(0, 0.5), new Point(width, 0.5));
+                dc.DrawLine(foregroundPen, new Point(0.5, 0), new Point(0.5, height));
+            }
         }
 
         private void RenderHorizontalScale(DrawingContext dc, Pen foregroundPen)
@@ -201,6 +247,8 @@ namespace Ruler
             var width = ActualWidth;
             var height = ActualHeight;
             double textHeight = 0;
+            double yOffset = ThinScale ? 16 : 32;
+            double yLabel = yOffset;
 
             var tm = tickMap[ScaleUnits];
             double unitsSize = DipConverter.Convert(width, ScaleUnits, Orientation.Horizontal);
@@ -211,6 +259,8 @@ namespace Ruler
                     Modulo(unit, tm.MediumLargeTick, tm.Step) ? 24 :
                     Modulo(unit, tm.MediumTick, tm.Step) ? 16 :
                     Modulo(unit, tm.SmallTick, tm.Step) ? 8 : 0;
+
+                if (ThinScale) len /= 2;
 
                 if (len > 0)
                 {
@@ -226,8 +276,8 @@ namespace Ruler
                     var label = FormatText(unit, FontSize);
                     textHeight = label.Height;
                     double x = Math.Max(1, Math.Min(dip - label.Width / 2, width - label.Width - 1));
-                    double y = Flip ? height - label.Height - 32 : 32;
-                    dc.DrawText(label, new(x, y));
+                    yLabel = Flip ? height - label.Height - yOffset : yOffset;
+                    dc.DrawText(label, new(x, yLabel));
                 }
             }
 
@@ -241,7 +291,7 @@ namespace Ruler
             var tpxText = FormatText(tpxInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
 
             var xpos = TrackPoint.X - tpxText.Width - 6 < 0 ? TrackPoint.X + 1 : TrackPoint.X - tpxText.Width - 6;
-            var ypos = Flip ? height - tpxText.Height - textHeight - 32 : 32 + textHeight;
+            var ypos = ThinScale ? yLabel : Flip ? height - tpxText.Height - textHeight - yOffset : yOffset + textHeight;
             textHeight += tpxText.Height;
 
             dc.DrawText(tpxText, new(xpos, ypos));
@@ -256,7 +306,7 @@ namespace Ruler
                     double markerInUnits = DipConverter.Convert(marker, ScaleUnits, Orientation.Horizontal);
                     var markerText = FormatText(markerInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Marker);
                     var xmkr = marker - markerText.Width - 6 < 0 ? marker + 1 : marker - markerText.Width - 6;
-                    var yMkr = Flip ? height - markerText.Height - textHeight - 32 : 32 + textHeight;
+                    var yMkr = ThinScale ? yLabel : Flip ? height - markerText.Height - textHeight - yOffset : yOffset + textHeight;
                     dc.DrawText(markerText, new(xmkr, yMkr));
                 }
             }
@@ -266,6 +316,8 @@ namespace Ruler
         {
             var width = ActualWidth;
             var height = ActualHeight;
+            double xOffset = ThinScale ? 12 : 20;
+            double xLabel = xOffset;
 
             var tm = tickMap[ScaleUnits];
             double unitsSize = DipConverter.Convert(height, ScaleUnits, Orientation.Vertical);
@@ -276,6 +328,8 @@ namespace Ruler
                     Modulo(unit, tm.MediumLargeTick, tm.Step) ? 12 :
                     Modulo(unit, tm.MediumTick, tm.Step) ? 8 :
                     Modulo(unit, tm.SmallTick, tm.Step) ? 4 : 0;
+
+                if (ThinScale) len /= 2;
 
                 if (len > 0)
                 {
@@ -289,9 +343,9 @@ namespace Ruler
                     double dip = DipConverter.ToDIP(unit, height,
                         ZeroPoint, ScaleUnits, Orientation.Vertical);
                     var label = FormatText(unit, FontSize);
-                    double x = Flip ? 20 : width - label.Width - 20;
+                    xLabel = Flip ? xOffset : width - label.Width - xOffset;
                     double y = Math.Max(0, Math.Min(dip - label.Height / 2, height - label.Height));
-                    dc.DrawText(label, new(x, y));
+                    dc.DrawText(label, new(xLabel, y));
                 }
             }
 
@@ -304,7 +358,7 @@ namespace Ruler
             double tyInUnits = DipConverter.Convert(ty, ScaleUnits, Orientation.Vertical);
             var ymarker = FormatText(tyInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
 
-            var xpos = Flip ? width - ymarker.Width - 4 : 4;
+            var xpos = ThinScale ? xLabel : Flip ? width - ymarker.Width - 4 : 4;
             var ypos = TrackPoint.Y - ymarker.Height - 1 < 0 ?
                 TrackPoint.Y + 1 : TrackPoint.Y - ymarker.Height - 1;
 
@@ -319,7 +373,7 @@ namespace Ruler
 
                     double markerInUnits = DipConverter.Convert(marker, ScaleUnits, Orientation.Vertical);
                     var markerText = FormatText(markerInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Marker);
-                    var xmkr = Flip ? width - markerText.Width - 4 : 4;
+                    var xmkr = ThinScale ? xLabel : Flip ? width - markerText.Width - 4 : 4;
                     var yMkr = marker - markerText.Height - 1 < 0 ?
                         marker + 1 : marker - markerText.Height - 1;
                     dc.DrawText(markerText, new(xmkr, yMkr));

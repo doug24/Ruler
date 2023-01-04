@@ -91,7 +91,21 @@
                 <MenuItem Header="Flip Scale" IsCheckable="True"
                           IsChecked="{Binding Flip, Mode=TwoWay}"
                           InputGestureText="S"/>
-                <MenuItem Header="Layout" Click="ShowLayoutDialog_Click"
+                <MenuItem Header="Thin Scale" IsCheckable="True"
+                          IsChecked="{Binding ThinScale, Mode=TwoWay}"
+                          InputGestureText="T"/>
+                <MenuItem Header="Always On Top" IsCheckable="True"
+                          IsChecked="{Binding TopMost, Mode=TwoWay}"
+                          InputGestureText="P"/>
+                <Separator/>
+                <MenuItem Header="Set Marker" Command="{Binding SetMarkerCommand}"
+                          InputGestureText="M"/>
+                <MenuItem Header="Remove Marker" Command="{Binding RemoveMarkerCommand}"
+                          InputGestureText="R"/>
+                <MenuItem Header="Clear Markers" Command="{Binding ClearMarkersCommand}"
+                          InputGestureText="C"/>
+                <Separator/>
+                <MenuItem Header="Layout…" Click="ShowLayoutDialog_Click"
                           InputGestureText="L"/>
                 <Separator/>
                 <MenuItem Header="Exit" Click="Exit_Click"
@@ -106,6 +120,8 @@
                      ShortAxis="{Binding ShortAxis, Mode=OneWayToSource}"
                      ColorTheme="{Binding ColorTheme}"
                      Opacity="{Binding Opacity}"
+                     ShowBorders="{Binding ShowBorders}"
+                     ThinScale="{Binding ThinScale}"
                      Orientation="{Binding Orientation}"
                      ScaleUnits="{Binding ScaleUnits}"
                      ZeroPoint="{Binding ZeroPoint}"

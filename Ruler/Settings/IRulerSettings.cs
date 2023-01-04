@@ -46,6 +46,12 @@ namespace Ruler
         [DefaultValue(1d)]
         double Opacity { get; set; }
 
+        [DefaultValue(true)]
+        bool ShowBorders { get; set; }
+
+        [DefaultValue(false)]
+        bool ThinScale { get; set; }
+
         [DefaultValue(false)]
         bool TopMost { get; set; }
 

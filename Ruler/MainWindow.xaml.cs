@@ -202,12 +202,20 @@ namespace Ruler
                     viewModel.Flip = !viewModel.Flip;
                     e.Handled = true;
                     break;
+                case Key.T:
+                    viewModel.ThinScale = !viewModel.ThinScale;
+                    e.Handled = true;
+                    break;
                 case Key.N:
                     viewModel.ZeroPoint = ZeroPoint.Near;
                     e.Handled = true;
                     break;
                 case Key.F:
                     viewModel.ZeroPoint = ZeroPoint.Far;
+                    e.Handled = true;
+                    break;
+                case Key.P:
+                    viewModel.TopMost = !viewModel.TopMost;
                     e.Handled = true;
                     break;
                 case Key.D1:
@@ -238,7 +246,7 @@ namespace Ruler
                     viewModel.SetMarker();
                     e.Handled = true;
                     break;
-                case Key.D:
+                case Key.R:
                     viewModel.RemoveMarker();
                     e.Handled = true;
                     break;
