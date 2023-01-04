@@ -56,6 +56,9 @@ namespace Ruler
         private double height = 80;
 
         [ObservableProperty]
+        private double shortAxis = 80;
+
+        [ObservableProperty]
         private bool flip = false;
 
         [ObservableProperty]
@@ -194,6 +197,17 @@ namespace Ruler
                 else if (Orientation == Orientation.Vertical)
                 {
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
+                }
+            }
+            else if (e.PropertyName == nameof(ShortAxis))
+            {
+                if (Orientation == Orientation.Horizontal)
+                {
+                    Height = ShortAxis;
+                }
+                else if (Orientation == Orientation.Vertical)
+                {
+                    Width = ShortAxis;
                 }
             }
         }

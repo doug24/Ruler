@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,6 +22,16 @@ namespace Ruler
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Scale),
                 new FrameworkPropertyMetadata(typeof(Scale)));
         }
+
+        public double ShortAxis
+        {
+            get { return (double)GetValue(ShortAxisProperty); }
+            set { SetValue(ShortAxisProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShortAxisProperty =
+            DependencyProperty.Register("ShortAxis", typeof(double), typeof(Scale),
+            new FrameworkPropertyMetadata(80d, FrameworkPropertyMetadataOptions.AffectsParentMeasure));
 
         public static readonly DependencyProperty MarkersProperty =
             DependencyProperty.Register(
@@ -114,6 +123,33 @@ namespace Ruler
         {
             timer.Stop();
             toolTip.IsOpen = false;
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            if (Orientation == Orientation.Horizontal)
+            {
+                double height = 32;
+                var ft = FormatText(100, FontSize);
+                height += ft.Height;
+                ft = FormatText(100, MarkerFontSize);
+                height += 2 * ft.Height;
+                height = Math.Round(height + 0.5, 0);
+                ShortAxis = height;
+                return new(constraint.Width, height);
+            }
+            else
+            {
+                double width = 16;
+                var ft = FormatText(1234, FontSize);
+                width += ft.Width;
+                ft = FormatText(1234.5, MarkerFontSize);
+                width += ft.Width;
+                width = Math.Round(width + 0.5, 0);
+                ShortAxis = width;
+                return new(width, constraint.Height);
+            }
+            //return base.MeasureOverride(constraint);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

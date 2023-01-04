@@ -224,19 +224,19 @@ namespace Ruler
                     break;
                 case Key.M:
                     viewModel.SetMarker();
-                    e.Handled|= true;
+                    e.Handled = true;
                     break;
                 case Key.D:
                     viewModel.RemoveMarker();
-                    e.Handled|= true;
+                    e.Handled = true;
                     break;
                 case Key.C:
                     viewModel.ClearMarkers();
-                    e.Handled|= true;
+                    e.Handled = true;
                     break;
                 case Key.L:
                     ShowLayoutDialog_Click(sender, e);
-                    e.Handled|= true;
+                    e.Handled = true;
                     break;
                 case Key.Escape:
                     Exit_Click(sender, new());

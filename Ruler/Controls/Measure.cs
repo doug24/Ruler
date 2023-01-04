@@ -113,7 +113,7 @@ namespace Ruler
 
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(Measure),
-            new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender));
+            new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public Units ScaleUnits
         {
@@ -173,7 +173,7 @@ namespace Ruler
 
         public static readonly DependencyProperty MarkerFontSizeProperty =
             DependencyProperty.Register("MarkerFontSize", typeof(double), typeof(Measure),
-            new FrameworkPropertyMetadata(12d, FrameworkPropertyMetadataOptions.AffectsRender));
+            new FrameworkPropertyMetadata(12d, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         protected void Drawline(DrawingContext dc, Pen pen,
             double location, double length, Orientation orientation)
