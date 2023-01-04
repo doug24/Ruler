@@ -43,6 +43,12 @@ namespace Ruler
         [DefaultValue(13d)]
         double DialogFontSize { get; set; }
 
+        [DefaultValue(1d)]
+        double Opacity { get; set; }
+
+        [DefaultValue(false)]
+        bool TopMost { get; set; }
+
         [DefaultValue("")]
         string Markers { get; set; }
 

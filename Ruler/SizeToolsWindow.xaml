@@ -26,6 +26,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
@@ -41,7 +42,7 @@
         </GroupBox>
 
         <UniformGrid Grid.Row="1" Rows="1">
-            <GroupBox DockPanel.Dock="Left" Margin="3,0" Header="Zero Point">
+            <GroupBox Margin="3,0" Header="Zero Point">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton Content="Near" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
@@ -80,7 +81,25 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Row="3" Margin="3,0" Header="Color Theme">
+        <UniformGrid Grid.Row="3" Rows="1">
+            <GroupBox Margin="3,0" Header="Opacity">
+                <Slider VerticalAlignment="Center"
+                        Value="{Binding Opacity}"
+                        Minimum="0.1"
+                        Maximum="1.0"
+                        TickFrequency=".1"
+                        LargeChange=".1"
+                        IsSnapToTickEnabled="True" 
+                        AutoToolTipPlacement="TopLeft"
+                        AutoToolTipPrecision="1" />
+            </GroupBox>
+            <GroupBox Margin="3,0" Header="Window">
+                <CheckBox Content="Always on top"
+                          IsChecked="{Binding TopMost}"/>
+            </GroupBox>
+        </UniformGrid>
+
+        <GroupBox Grid.Row="4" Margin="3,0" Header="Color Theme">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Light" Margin="3" GroupName="Color"
                          IsChecked="{Binding ColorTheme, 
@@ -93,7 +112,7 @@
                             Converter={StaticResource enumBool}, ConverterParameter=Custom, Mode=TwoWay}"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="4" Margin="3,0" Header="Fonts">
+        <GroupBox Grid.Row="5" Margin="3,0" Header="Fonts">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -180,7 +199,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="5" Margin="3,0" Header="Magnifier">
+        <GroupBox Grid.Row="7" Margin="3,0" Header="Magnifier">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Grid.Row="1" Grid.Column="0" Content="Width" Margin="3,0" />

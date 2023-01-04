@@ -100,6 +100,12 @@ namespace Ruler
         [ObservableProperty]
         private double dialogFontSize = 13.0;
 
+        [ObservableProperty]
+        private double opacity = 1;
+
+        [ObservableProperty]
+        private bool topMost = false;
+
         public Theme ColorTheme
         {
             get { return RulerSettings.Default.ColorTheme; }
@@ -221,9 +227,11 @@ namespace Ruler
             MagnifierWidth = RulerSettings.Default.MagnifierWidth;
             MagnifierHeight = RulerSettings.Default.MagnifierHeight;
             FontFamily = RulerSettings.Default.FontFamily;
-            FontSize= RulerSettings.Default.FontSize;
-            MarkerFontSize= RulerSettings.Default.MarkerFontSize;
-            DialogFontSize= RulerSettings.Default.DialogFontSize;
+            FontSize = RulerSettings.Default.FontSize;
+            MarkerFontSize = RulerSettings.Default.MarkerFontSize;
+            DialogFontSize = RulerSettings.Default.DialogFontSize;
+            Opacity = RulerSettings.Default.Opacity;
+            TopMost = RulerSettings.Default.TopMost;
 
             var parts = RulerSettings.Default.Markers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var num in parts)
@@ -250,6 +258,8 @@ namespace Ruler
             RulerSettings.Default.FontSize = FontSize;
             RulerSettings.Default.MarkerFontSize = MarkerFontSize;
             RulerSettings.Default.DialogFontSize = DialogFontSize;
+            RulerSettings.Default.Opacity = Opacity;
+            RulerSettings.Default.TopMost = TopMost;
             RulerSettings.Default.Markers = string.Join(",", Markers);
 
             SaveCurrentLayout();
