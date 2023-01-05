@@ -21,7 +21,7 @@ namespace Ruler
         {
             settings = new ConfigurationBuilder<IRulerSettings>()
                 .UseTypeParser(new ColorParser())
-                .UseJsonFile("settings.json")
+                .UseJsonFile("Ruler.settings.json")
                 .Build();
 
 
