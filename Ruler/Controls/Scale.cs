@@ -190,7 +190,6 @@ namespace Ruler
                 ShortAxis = width;
                 return new(width, constraint.Height);
             }
-            //return base.MeasureOverride(constraint);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

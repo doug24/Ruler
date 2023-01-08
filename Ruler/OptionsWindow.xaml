@@ -1,4 +1,4 @@
-﻿<Window x:Class="Ruler.SizeToolsWindow"
+﻿<Window x:Class="Ruler.OptionsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -48,10 +48,10 @@
             </GroupBox>
             <GroupBox Grid.Column="1" Margin="3,0" Header="Zero Point">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="Begin" Margin="3" GroupName="Zero"
+                    <RadioButton Content="Near" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
                                     Converter={StaticResource enumBool}, ConverterParameter=Near}"/>
-                    <RadioButton Content="End" Margin="3" GroupName="Zero"
+                    <RadioButton Content="Far" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
                                     Converter={StaticResource enumBool}, ConverterParameter=Far}"/>
                 </StackPanel>

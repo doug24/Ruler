@@ -4,11 +4,11 @@ using System.Windows.Input;
 namespace Ruler
 {
     /// <summary>
-    /// Interaction logic for SizeToolsWindow.xaml
+    /// Interaction logic for OptionsWindow.xaml
     /// </summary>
-    public partial class SizeToolsWindow : Window
+    public partial class OptionsWindow : Window
     {
-        public SizeToolsWindow(RulerViewModel vm)
+        public OptionsWindow(RulerViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;

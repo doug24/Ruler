@@ -80,11 +80,11 @@
                               InputGestureText="V"/>
                 </MenuItem>
                 <MenuItem Header="Zero Point">
-                    <MenuItem Header="Begin" IsCheckable="True"
+                    <MenuItem Header="Near" IsCheckable="True"
                               IsChecked="{Binding ZeroPoint, Mode=TwoWay,
                                 Converter={StaticResource enumToBool}, ConverterParameter=Near}"
                               InputGestureText="["/>
-                    <MenuItem Header="End" IsCheckable="True"
+                    <MenuItem Header="Far" IsCheckable="True"
                               IsChecked="{Binding ZeroPoint, Mode=TwoWay,
                                 Converter={StaticResource enumToBool}, ConverterParameter=Far}"
                               InputGestureText="]"/>

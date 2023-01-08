@@ -199,7 +199,7 @@ namespace Ruler
             Markers.Clear();
         }
 
-        public IList<FontInfo> FontFamilies
+        public static IList<FontInfo> FontFamilies
         {
             get { return Fonts.SystemFontFamilies.Select(r => new FontInfo(r.Source)).OrderBy(f => f.FamilyName).ToList(); }
         }

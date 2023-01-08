@@ -16,7 +16,7 @@ namespace Ruler
     {
         private readonly RulerViewModel viewModel = new();
         private readonly DispatcherTimer dispatcherTimer;
-        private SizeToolsWindow? optionsDialog;
+        private OptionsWindow? optionsDialog;
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
         private double minDip = 1d;
