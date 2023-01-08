@@ -217,7 +217,7 @@ namespace Ruler
             {
                 num = Math.Round(num, 1);
             }
-            return FormatText(num.ToString(), fontSize);
+            return FormatText(num.ToString("0.##"), fontSize);
         }
 
         protected FormattedText FormatText(double num, double fontSize, Brush foreground)
@@ -234,7 +234,7 @@ namespace Ruler
             {
                 num = Math.Round(num, 1);
             }
-            return FormatText(num.ToString(), fontSize, foreground);
+            return FormatText(num.ToString("0.##"), fontSize, foreground);
         }
 
         protected FormattedText FormatText(string text, double fontSize)
