@@ -42,6 +42,7 @@
                 <MenuItem Header="Magnifier" IsCheckable="True" 
                           IsChecked="{Binding MagnifierVisible, Mode=TwoWay}"
                           InputGestureText="Q"/>
+                <Separator/>
                 <MenuItem Header="Units">
                     <MenuItem Header="Pixel" IsCheckable="True"
                               IsChecked="{Binding ScaleUnits, Mode=TwoWay,
@@ -79,34 +80,61 @@
                               InputGestureText="V"/>
                 </MenuItem>
                 <MenuItem Header="Zero Point">
-                    <MenuItem Header="Near" IsCheckable="True"
+                    <MenuItem Header="Begin" IsCheckable="True"
                               IsChecked="{Binding ZeroPoint, Mode=TwoWay,
                                 Converter={StaticResource enumToBool}, ConverterParameter=Near}"
-                              InputGestureText="N"/>
-                    <MenuItem Header="Far" IsCheckable="True"
+                              InputGestureText="["/>
+                    <MenuItem Header="End" IsCheckable="True"
                               IsChecked="{Binding ZeroPoint, Mode=TwoWay,
                                 Converter={StaticResource enumToBool}, ConverterParameter=Far}"
-                              InputGestureText="F"/>
+                              InputGestureText="]"/>
                 </MenuItem>
                 <MenuItem Header="Flip Scale" IsCheckable="True"
                           IsChecked="{Binding Flip, Mode=TwoWay}"
                           InputGestureText="S"/>
-                <MenuItem Header="Thin Scale" IsCheckable="True"
+                <MenuItem Header="Narrow Scale" IsCheckable="True"
                           IsChecked="{Binding ThinScale, Mode=TwoWay}"
-                          InputGestureText="T"/>
-                <MenuItem Header="Always On Top" IsCheckable="True"
-                          IsChecked="{Binding TopMost, Mode=TwoWay}"
-                          InputGestureText="P"/>
+                          InputGestureText="N"/>
                 <Separator/>
                 <MenuItem Header="Set Marker" Command="{Binding SetMarkerCommand}"
                           InputGestureText="M"/>
                 <MenuItem Header="Remove Marker" Command="{Binding RemoveMarkerCommand}"
-                          InputGestureText="R"/>
+                          InputGestureText="D"/>
                 <MenuItem Header="Clear Markers" Command="{Binding ClearMarkersCommand}"
                           InputGestureText="C"/>
                 <Separator/>
-                <MenuItem Header="Layout…" Click="ShowLayoutDialog_Click"
-                          InputGestureText="L"/>
+                <MenuItem Header="Window">
+                    <MenuItem Header="Always On Top" IsCheckable="True"
+                                IsChecked="{Binding TopMost, Mode=TwoWay}"
+                                InputGestureText="P"/>
+                    <MenuItem Header="Minimize"
+                                Click="Minimize_Click"
+                                InputGestureText="–"/>
+                    <MenuItem Header="Maximize"
+                              Command="{Binding MaximizeRulerCommand}" 
+                              InputGestureText="+"/>
+                    <MenuItem Header="Restore"
+                              Command="{Binding RestoreRulerCommand}" 
+                              InputGestureText="Backspace"/>
+                    <MenuItem Header="Dock Left"
+                              Command="{Binding DockRulerCommand}" 
+                              CommandParameter="Left"
+                              InputGestureText="L"/>
+                    <MenuItem Header="Dock Top"
+                              Command="{Binding DockRulerCommand}" 
+                              CommandParameter="Top"
+                              InputGestureText="T"/>
+                    <MenuItem Header="Dock Right"
+                              Command="{Binding DockRulerCommand}" 
+                              CommandParameter="Right"
+                              InputGestureText="R"/>
+                    <MenuItem Header="Dock Bottom"
+                              Command="{Binding DockRulerCommand}" 
+                              CommandParameter="Bottom"
+                              InputGestureText="B"/>
+                    </MenuItem>
+                <MenuItem Header="Options…" Click="ShowOptionsDialog_Click"
+                          InputGestureText="O"/>
                 <Separator/>
                 <MenuItem Header="Exit" Click="Exit_Click"
                           InputGestureText="Esc"/>

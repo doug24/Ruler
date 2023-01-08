@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows;
+﻿using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -62,6 +60,8 @@ namespace Ruler
 
         ILayout VerticalRuler { get; }
 
+        ILayoutSnapshot WindowSnapshot { get; set; }
+
         IColorPalette CustomColors { get; }
     }
 
@@ -81,6 +81,17 @@ namespace Ruler
 
         [DefaultValue(false)]
         bool Flip { get; set; }
+
+        [DefaultValue(false)]
+        bool ThinScale { get; set; }
+    }
+
+    public interface ILayoutSnapshot : ILayout
+    {
+        [DefaultValue(true)]
+        bool IsEmpty { get; set; }
+
+        Orientation Orientation { get; set; }
     }
 
     public interface IColorPalette

@@ -12,6 +12,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Ruler
 {
+    public enum Placement { Floating, Left, Top, Right, Bottom, MaximizedWidth, MaximizedHeight }
+
     public partial class RulerViewModel : ObservableObject
     {
         public RulerViewModel()
@@ -132,6 +134,15 @@ namespace Ruler
         public ICommand ClearMarkersCommand => new RelayCommand(
             p => ClearMarkers());
 
+        public ICommand MaximizeRulerCommand => new RelayCommand(
+            p => Maximize());
+
+        public ICommand RestoreRulerCommand => new RelayCommand(
+            p => RestoreSnapshot(),
+            q => !RulerSettings.Default.WindowSnapshot.IsEmpty);
+
+        public ICommand DockRulerCommand => new RelayCommand(
+            p => DockRuler(p as string));
 
         public ObservableCollection<double> Markers { get; set; } = new();
 
@@ -193,6 +204,78 @@ namespace Ruler
             get { return Fonts.SystemFontFamilies.Select(r => new FontInfo(r.Source)).OrderBy(f => f.FamilyName).ToList(); }
         }
 
+        internal void Maximize()
+        {
+            if (Orientation == Orientation.Horizontal)
+            {
+                DockRuler(Placement.MaximizedWidth);
+            }
+            else
+            {
+                DockRuler(Placement.MaximizedHeight);
+            }
+        }
+
+        private void DockRuler(string? name)
+        {
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse(name, out Placement value))
+            {
+                DockRuler(value);
+            }
+        }
+
+        internal void DockRuler(Placement location)
+        {
+            SnapshotWindow();
+            var window = Application.Current.MainWindow;
+            Screen screen = Screen.FromWindow(window);
+
+            switch (location)
+            {
+                case Placement.Left:
+                    Orientation = Orientation.Vertical;
+                    ZeroPoint = ZeroPoint.Near;
+                    Flip = false;
+                    Left = 0;
+                    Top = 0;
+                    Height = screen.WorkingAreaDip.Height;
+                    break;
+                case Placement.Right:
+                    Orientation = Orientation.Vertical;
+                    ZeroPoint = ZeroPoint.Near;
+                    Flip = true;
+                    Left = screen.WorkingAreaDip.Right - window.ActualWidth;
+                    Top = 0;
+                    Height = screen.WorkingAreaDip.Height;
+                    break;
+                case Placement.Top:
+                    Orientation = Orientation.Horizontal;
+                    ZeroPoint = ZeroPoint.Near;
+                    Flip = true;
+                    Left = 0;
+                    Top = 0;
+                    Width = screen.WorkingAreaDip.Width;
+                    break;
+                case Placement.Bottom:
+                    Orientation = Orientation.Horizontal;
+                    ZeroPoint = ZeroPoint.Near;
+                    Flip = false;
+                    Left = 0;
+                    Top = screen.WorkingAreaDip.Height - window.ActualHeight;
+                    Width = screen.WorkingAreaDip.Width;
+                    break;
+                case Placement.MaximizedWidth:
+                    Left = 0;
+                    Width = screen.WorkingAreaDip.Width;
+                    break;
+                case Placement.MaximizedHeight:
+                    Top = 0;
+                    Height = screen.WorkingAreaDip.Height;
+                    break;
+            }
+        }
+
+
         private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
             // save current layout values before changing
@@ -204,7 +287,7 @@ namespace Ruler
 
         private void RulerViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Orientation))
+            if (e.PropertyName is nameof(Orientation))
             {
                 RulerSettings.Default.Orientation = Orientation;
 
@@ -212,18 +295,18 @@ namespace Ruler
                 RestoreCurrentLayout();
                 SetBorderProperties();
             }
-            else if (e.PropertyName == nameof(Flip))
+            else if (e.PropertyName is nameof(Flip))
             {
                 if (Orientation == Orientation.Horizontal)
                 {
                     ActiveEdge = Flip ? Edge.Bottom : Edge.Top;
                 }
-                else if (Orientation == Orientation.Vertical)
+                else if (Orientation is Orientation.Vertical)
                 {
                     ActiveEdge = Flip ? Edge.Left : Edge.Right;
                 }
             }
-            else if (e.PropertyName == nameof(ShortAxis))
+            else if (e.PropertyName is nameof(ShortAxis))
             {
                 if (Orientation == Orientation.Horizontal)
                 {
@@ -295,6 +378,7 @@ namespace Ruler
             Height = RulerSettings.CurrentLayout.Height;
             ZeroPoint = RulerSettings.CurrentLayout.ZeroPoint;
             Flip = RulerSettings.CurrentLayout.Flip;
+            ThinScale = RulerSettings.CurrentLayout.ThinScale;
         }
 
         private void SaveCurrentLayout()
@@ -305,6 +389,50 @@ namespace Ruler
             RulerSettings.CurrentLayout.Height = Height;
             RulerSettings.CurrentLayout.ZeroPoint = ZeroPoint;
             RulerSettings.CurrentLayout.Flip = Flip;
+            RulerSettings.CurrentLayout.ThinScale = ThinScale;
+        }
+
+        private void SnapshotWindow()
+        {
+            var snap = RulerSettings.Default.WindowSnapshot;
+            if (snap.IsEmpty)
+            {
+                snap.Orientation = Orientation;
+                snap.Left = Left;
+                snap.Top = Top;
+                snap.Width = Width;
+                snap.Height = Height;
+                snap.ZeroPoint = ZeroPoint;
+                snap.Flip = Flip;
+                snap.ThinScale = ThinScale;
+                snap.IsEmpty = false;
+            }
+        }
+
+        internal void RestoreSnapshot()
+        {
+            var snap = RulerSettings.Default.WindowSnapshot;
+            if (!snap.IsEmpty)
+            {
+                Orientation = snap.Orientation;
+                ZeroPoint = snap.ZeroPoint;
+                Flip = snap.Flip;
+                Left = snap.Left;
+                Top = snap.Top;
+
+                if (snap.Orientation == Orientation.Horizontal)
+                {
+                    Width = snap.Width;
+                }
+                else
+                {
+                    Height = snap.Height;
+                }
+                ThinScale = snap.ThinScale;
+
+                // reset
+                snap.IsEmpty = true;
+            }
         }
 
         private void SetBorderProperties()

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,7 +19,6 @@ namespace Ruler
         private SizeToolsWindow? optionsDialog;
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
-        private double leftRestore = double.NaN, topRestore = double.NaN, widthRestore = 20, heightRestore = 20;
         private double minDip = 1d;
 
         public MainWindow()
@@ -40,7 +38,6 @@ namespace Ruler
             PreviewKeyDown += MainWindow_PreviewKeyDown;
 
             ruler.MouseDown += MainWindow_MouseDown;
-            ruler.PreviewMouseDown += Ruler_PreviewMouseDown;
 
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
@@ -55,17 +52,17 @@ namespace Ruler
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(viewModel.Flip) ||
-                e.PropertyName == nameof(viewModel.ZeroPoint) ||
-                e.PropertyName == nameof(viewModel.Orientation))
+            if (e.PropertyName is (nameof(viewModel.Flip)) or
+                (nameof(viewModel.ZeroPoint)) or
+                (nameof(viewModel.Orientation)))
             {
                 UpdateOrigin();
             }
-            else if (e.PropertyName == nameof(viewModel.AngleVisible))
+            else if (e.PropertyName is nameof(viewModel.AngleVisible))
             {
                 ShowAngle(viewModel.AngleVisible);
             }
-            else if (e.PropertyName == nameof(viewModel.MagnifierVisible))
+            else if (e.PropertyName is nameof(viewModel.MagnifierVisible))
             {
                 ShowMagnifier(viewModel.MagnifierVisible);
             }
@@ -80,9 +77,27 @@ namespace Ruler
             UpdateTooltip();
         }
 
-        private void MainWindow_SizeChanged(object? sender, EventArgs e)
+        private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
         {
-            UpdateTooltip();
+            var screen = Screen.FromWindow(this);
+
+            // does it look like the ruler is docked to the right?
+            if (e.WidthChanged &&
+                Top == 0 && ActualHeight == screen.WorkingAreaDip.Height &&
+                Left == screen.WorkingAreaDip.Width - e.PreviousSize.Width)
+            {
+                // adjust position for the new width
+                Left = screen.WorkingAreaDip.Right - e.NewSize.Width;
+            }
+
+            // does it look like the ruler is docked to the bottom?
+            if (e.HeightChanged &&
+                Left == 0 && ActualWidth == screen.WorkingAreaDip.Width &&
+                Top == screen.WorkingAreaDip.Height - e.PreviousSize.Height)
+            {
+                // adjust position for the new height
+                Top = screen.WorkingAreaDip.Height - e.NewSize.Height;
+            }
         }
 
         private void UpdateTooltip()
@@ -202,15 +217,15 @@ namespace Ruler
                     viewModel.Flip = !viewModel.Flip;
                     e.Handled = true;
                     break;
-                case Key.T:
+                case Key.N:
                     viewModel.ThinScale = !viewModel.ThinScale;
                     e.Handled = true;
                     break;
-                case Key.N:
+                case Key.OemOpenBrackets:
                     viewModel.ZeroPoint = ZeroPoint.Near;
                     e.Handled = true;
                     break;
-                case Key.F:
+                case Key.OemCloseBrackets:
                     viewModel.ZeroPoint = ZeroPoint.Far;
                     e.Handled = true;
                     break;
@@ -246,7 +261,7 @@ namespace Ruler
                     viewModel.SetMarker();
                     e.Handled = true;
                     break;
-                case Key.R:
+                case Key.D:
                     viewModel.RemoveMarker();
                     e.Handled = true;
                     break;
@@ -254,8 +269,8 @@ namespace Ruler
                     viewModel.ClearMarkers();
                     e.Handled = true;
                     break;
-                case Key.L:
-                    ShowLayoutDialog_Click(sender, e);
+                case Key.O:
+                    ShowOptionsDialog_Click(sender, e);
                     e.Handled = true;
                     break;
                 case Key.OemMinus:
@@ -263,7 +278,27 @@ namespace Ruler
                     e.Handled = true;
                     break;
                 case Key.OemPlus:
-                    MaximizeRestore();
+                    viewModel.Maximize();
+                    e.Handled = true;
+                    break;
+                case Key.Back:
+                    viewModel.RestoreSnapshot();
+                    e.Handled = true;
+                    break;
+                case Key.T:
+                    viewModel.DockRuler(Placement.Top);
+                    e.Handled = true;
+                    break;
+                case Key.B:
+                    viewModel.DockRuler(Placement.Bottom);
+                    e.Handled = true;
+                    break;
+                case Key.L:
+                    viewModel.DockRuler(Placement.Left);
+                    e.Handled = true;
+                    break;
+                case Key.R:
+                    viewModel.DockRuler(Placement.Right);
                     e.Handled = true;
                     break;
                 case Key.Escape:
@@ -273,41 +308,9 @@ namespace Ruler
             }
         }
 
-        private void MaximizeRestore()
+        private void Minimize_Click(object sender, RoutedEventArgs e)
         {
-            Screen screen = Screen.FromWindow(this);
-            if (viewModel.Orientation == Orientation.Horizontal)
-            {
-                if (!double.IsNaN(leftRestore))
-                {
-                    Left = leftRestore;
-                    Width = widthRestore;
-                    leftRestore = double.NaN;
-                }
-                else
-                {
-                    leftRestore = Left;
-                    widthRestore = ActualWidth;
-                    Left = 0;
-                    Width = screen.WorkingAreaDip.Width;
-                }
-            }
-            else
-            {
-                if (!double.IsNaN(topRestore))
-                {
-                    Top = topRestore;
-                    Height = heightRestore;
-                    topRestore = double.NaN;
-                }
-                else
-                {
-                    topRestore = Top;
-                    heightRestore = ActualHeight;
-                    Top = 0;
-                    Height = screen.WorkingAreaDip.Height;
-                }
-            }
+            WindowState = WindowState.Minimized;
         }
 
         private static void MoveCursor(int xOffset, int yOffset)
@@ -340,42 +343,12 @@ namespace Ruler
             }
         }
 
-        private void Ruler_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (IsDoubleClick(e))
-            {
-                ShowLayoutDialog_Click(sender, e);
-                e.Handled = true;
-            }
-        }
-
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
             {
                 DragMove();
             }
-        }
-
-        private readonly Stopwatch doubleClickStopwatch = new();
-        private Point lastClickLocation;
-        private bool IsDoubleClick(MouseButtonEventArgs e)
-        {
-            Point currentLocation = e.GetPosition(this);
-            double dist = Math.Abs(Point.Subtract(currentLocation, lastClickLocation).Length);
-            bool clicksAreCloseInDistance = dist < 40;
-            lastClickLocation = currentLocation;
-
-            TimeSpan elapsed = doubleClickStopwatch.Elapsed;
-            doubleClickStopwatch.Restart();
-            bool clicksAreCloseInTime = (elapsed != TimeSpan.Zero && elapsed < TimeSpan.FromSeconds(0.7));
-
-            if (!clicksAreCloseInTime)
-            {
-                lastClickLocation = new(0, 0);
-            }
-
-            return clicksAreCloseInDistance && clicksAreCloseInTime;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -398,7 +371,7 @@ namespace Ruler
             }
         }
 
-        private void ShowLayoutDialog_Click(object sender, RoutedEventArgs e)
+        private void ShowOptionsDialog_Click(object sender, RoutedEventArgs e)
         {
             if (optionsDialog == null)
             {

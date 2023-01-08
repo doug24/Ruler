@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ruler"
         mc:Ignorable="d"
-        Title="Ruler Layout" 
+        Title="Ruler Options" 
         Icon="/ruler;component/images/ruler.ico"
         FontSize="{Binding DialogFontSize}"
         Width="480"
@@ -19,6 +19,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -47,10 +48,10 @@
             </GroupBox>
             <GroupBox Grid.Column="1" Margin="3,0" Header="Zero Point">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="Near" Margin="3" GroupName="Zero"
+                    <RadioButton Content="Begin" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
                                     Converter={StaticResource enumBool}, ConverterParameter=Near}"/>
-                    <RadioButton Content="Far" Margin="3" GroupName="Zero"
+                    <RadioButton Content="End" Margin="3" GroupName="Zero"
                                  IsChecked="{Binding ZeroPoint, 
                                     Converter={StaticResource enumBool}, ConverterParameter=Far}"/>
                 </StackPanel>
@@ -59,7 +60,7 @@
                 <StackPanel Orientation="Horizontal">
                     <CheckBox Content="Flip" Margin="3"
                               IsChecked="{Binding Flip}"/>
-                    <CheckBox Content="Thin scale" Margin="3"
+                    <CheckBox Content="Narrow" Margin="3"
                               IsChecked="{Binding ThinScale}"/>
                 </StackPanel>
             </GroupBox>
@@ -248,6 +249,15 @@
             <StackPanel Orientation="Horizontal">
                 <CheckBox Content="Show Perpendicular" Margin="3"
                           IsChecked="{Binding Perpendicular}"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="7" Margin="3,0" Header="Arrow Keys">
+            <StackPanel>
+                <TextBlock Text="Move the ruler window using arrow keys."/>
+                <TextBlock Text="Move the mouse cursor using Ctrl + arrow keys."/>
+                <TextBlock Text="Resize the ruler window using Alt + arrow keys."/>
+                <TextBlock Text="Add the Shift key to move faster."/>
             </StackPanel>
         </GroupBox>
 
