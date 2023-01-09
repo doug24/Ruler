@@ -46,10 +46,12 @@ namespace Ruler
 
         protected override void OnRender(DrawingContext dc)
         {
-            if (Application.Current.MainWindow != null)
+            Window window = Window.GetWindow(this);
+            Screen? screen = null;
+            if (window != null)
             {
-                Screen scr = Screen.FromWindow(Application.Current.MainWindow);
-                onePixelInDip = 1.0 / scr.ScaleX;
+                screen = Screen.FromWindow(window);
+                onePixelInDip = 1.0 / screen.ScaleX;
             }
 
             Pen linePen = new(RulerSettings.CurrentTheme.Angle, 1);
@@ -81,29 +83,34 @@ namespace Ruler
             GetArcLayout(dy, dx, radius, out double startDegrees, out double sweepDegrees,
                 out SweepDirection sweepDirection, out Point textOrigin, out FormattedText label);
 
-            dc.DrawCircularArc(null, linePen, Origin, radius,
+            var originClient = OffsetPointToClient(Origin, screen);
+            var mouseClient = OffsetPointToClient(MousePoint, screen);
+            var trackClient = OffsetPointToClient(TrackPoint, screen);
+            var textOriginClient = OffsetPointToClient(textOrigin, screen);
+
+            dc.DrawCircularArc(null, linePen, originClient, radius,
                 startDegrees, sweepDegrees, sweepDirection);
 
             // this keeps the mouse point 'within' the control and
             // not click through to other windows
-            dc.DrawRectangle(transparentBrush, null, new(MousePoint.X - 16, MousePoint.Y - 16, 32, 32));
+            dc.DrawRectangle(transparentBrush, null, new(mouseClient.X - 16, mouseClient.Y - 16, 32, 32));
 
             // hypotenuse
-            dc.DrawLine(linePen, Origin, MousePoint);
+            dc.DrawLine(linePen, originClient, mouseClient);
 
             if (Perpendicular)
             {
                 Point pt = Orientation == Orientation.Horizontal ?
-                    new(MousePoint.X, Origin.Y) : new(Origin.X, MousePoint.Y);
-                dc.DrawLine(mousePen, pt, MousePoint);
+                    new(mouseClient.X, originClient.Y) : new(originClient.X, mouseClient.Y);
+                dc.DrawLine(mousePen, pt, mouseClient);
 
                 // perpendicular offset text
-                double offset = Orientation == Orientation.Horizontal ? TrackPoint.Y : TrackPoint.X;
+                double offset = Orientation == Orientation.Horizontal ? trackClient.Y : trackClient.X;
                 double offsetInUnits = DipConverter.Convert(offset, ScaleUnits, Orientation);
                 var offsetMarker = FormatText(offsetInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
                 Point markerPoint = Orientation == Orientation.Horizontal ?
-                    new(MousePoint.X + 6, (MousePoint.Y + Origin.Y) / 2) :
-                    new((MousePoint.X + Origin.X) / 2, MousePoint.Y + 6);
+                    new(mouseClient.X + 6, (mouseClient.Y + originClient.Y) / 2) :
+                    new((mouseClient.X + originClient.X) / 2, mouseClient.Y + 6);
                 Rect offsetRect = new(markerPoint, new Size(offsetMarker.Width, offsetMarker.Height));
                 offsetRect.Inflate(2, 2);
                 dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, null, offsetRect, 2, 2);
@@ -111,10 +118,17 @@ namespace Ruler
             }
 
             // angle text
-            Rect textRect = new(textOrigin, new Size(label.Width, label.Height));
+            Rect textRect = new(textOriginClient, new Size(label.Width, label.Height));
             textRect.Inflate(4, 4);
             dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, foregroundPen, textRect, 4, 4);
-            dc.DrawText(label, textOrigin);
+            dc.DrawText(label, textOriginClient);
+        }
+
+        private static Point OffsetPointToClient(Point pt, Screen? screen)
+        {
+            if (screen == null) return pt;
+
+            return new(pt.X - screen.WorkingAreaDip.Left, pt.Y - screen.WorkingAreaDip.Top);
         }
 
         private void GetArcLayout(double dy, double dx, double radius,

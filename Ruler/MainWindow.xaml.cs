@@ -385,9 +385,11 @@ namespace Ruler
         {
             if (angleVisible)
             {
+                Screen screen = Screen.FromWindow(this);
+
                 if (angleWindow == null)
                 {
-                    angleWindow = new(viewModel)
+                    angleWindow = new(viewModel, screen)
                     {
                         Owner = this,
                         WindowStartupLocation = WindowStartupLocation.Manual
@@ -397,12 +399,6 @@ namespace Ruler
                 }
 
                 UpdateOrigin();
-
-                Screen screen = Screen.FromWindow(this);
-                angleWindow.Left = 0;
-                angleWindow.Top = 0;
-                angleWindow.Width = screen.WorkingAreaDip.Width;
-                angleWindow.Height = screen.WorkingAreaDip.Height;
                 angleWindow.Show();
             }
             else

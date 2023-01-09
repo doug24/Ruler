@@ -10,11 +10,19 @@ namespace Ruler
     {
         public event KeyEventHandler? ForwardKeyDown;
 
-        public OverlayWindow(RulerViewModel vm)
+        public OverlayWindow(RulerViewModel vm, Screen screen)
         {
             InitializeComponent();
             DataContext = vm;
+            DisplayName = screen.DeviceName;
+
+            Left = screen.WorkingAreaDip.Left;
+            Top = screen.WorkingAreaDip.Top;
+            Width = screen.WorkingAreaDip.Width;
+            Height = screen.WorkingAreaDip.Height;
         }
+
+        public string DisplayName { get; private set; }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
