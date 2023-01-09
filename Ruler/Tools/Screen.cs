@@ -54,6 +54,11 @@ namespace Ruler
             return -1250308577 + hMonitor.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return $"{DeviceName} [{WorkingAreaDip}]";
+        }
+
         public double ScaleX { get; } = 1.0;
         public double ScaleY { get; } = 1.0;
 

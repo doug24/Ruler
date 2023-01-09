@@ -20,12 +20,15 @@ namespace Ruler
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
         private double minDip = 1d;
+        private double windowSizeEpsilon;
 
         public MainWindow()
         {
             InitializeComponent();
 
             DataContext = viewModel;
+
+            windowSizeEpsilon = 8000d.GetContextualEpsilon();
 
             dispatcherTimer = new(TimeSpan.FromMilliseconds(50),
                 DispatcherPriority.Render, TimerCallback, Dispatcher);
@@ -79,31 +82,44 @@ namespace Ruler
 
         private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
         {
-            var screen = Screen.FromWindow(this);
+            var screen = Screen.FromPoint(new(Left, Top));
+            Rect rect = screen.WorkingAreaDip;
 
             // does it look like the ruler is docked to the right?
             if (e.WidthChanged &&
-                Top == 0 && ActualHeight == screen.WorkingAreaDip.Height &&
-                Left == screen.WorkingAreaDip.Width - e.PreviousSize.Width)
+                Top.AboutEquals(rect.Top, windowSizeEpsilon) &&
+                e.PreviousSize.Height.AboutEquals(rect.Height, windowSizeEpsilon) &&
+                Left.AboutEquals(rect.Right - e.PreviousSize.Width, windowSizeEpsilon))
             {
+                // move away from the screen edge
+                Left = rect.Right - 100;
                 // adjust position for the new width
-                Left = screen.WorkingAreaDip.Right - e.NewSize.Width;
+                this.MoveWindow(rect.Right - Width, rect.Top, Width, rect.Height);
+                this.ActivateWindow();
             }
 
             // does it look like the ruler is docked to the bottom?
             if (e.HeightChanged &&
-                Left == 0 && ActualWidth == screen.WorkingAreaDip.Width &&
-                Top == screen.WorkingAreaDip.Height - e.PreviousSize.Height)
+                Left.AboutEquals(rect.Left, windowSizeEpsilon) &&
+                e.PreviousSize.Width.AboutEquals(rect.Width, windowSizeEpsilon) &&
+                Top.AboutEquals(rect.Bottom - e.PreviousSize.Height, windowSizeEpsilon))
             {
+                // move away from the screen edge
+                Top = rect.Bottom - 100;
                 // adjust position for the new height
-                Top = screen.WorkingAreaDip.Height - e.NewSize.Height;
+                this.MoveWindow(rect.Left, rect.Bottom - Height, rect.Width, Height);
+                this.ActivateWindow();
             }
+        }
+
+        protected override void OnDeactivated(EventArgs e)
+        {
+            base.OnDeactivated(e);
         }
 
         private void UpdateTooltip()
         {
-            viewModel.ScaleToolTip = $"Left: {Left}" + Environment.NewLine +
-                $"Top: {Top}";
+            viewModel.ScaleToolTip = $"Left: {Left}" + Environment.NewLine + $"Top: {Top}";
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)

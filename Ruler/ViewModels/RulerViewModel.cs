@@ -226,9 +226,13 @@ namespace Ruler
 
         internal void DockRuler(Placement location)
         {
-            SnapshotWindow();
             var window = Application.Current.MainWindow;
-            Screen screen = Screen.FromWindow(window);
+            if (window == null)
+                return;
+
+            SnapshotWindow();
+            var screen = Screen.FromWindow(window);
+            Rect rect = screen.WorkingAreaDip;
 
             switch (location)
             {
@@ -236,50 +240,43 @@ namespace Ruler
                     Orientation = Orientation.Vertical;
                     ZeroPoint = ZeroPoint.Near;
                     Flip = false;
-                    Left = 0;
-                    Top = 0;
-                    Height = screen.WorkingAreaDip.Height;
+                    window.MoveWindow(rect.Left, rect.Top, Width, rect.Height);
                     break;
                 case Placement.Right:
                     Orientation = Orientation.Vertical;
                     ZeroPoint = ZeroPoint.Near;
                     Flip = true;
-                    Left = screen.WorkingAreaDip.Right - window.ActualWidth;
-                    Top = 0;
-                    Height = screen.WorkingAreaDip.Height;
+                    window.MoveWindow(rect.Right - Width, rect.Top, Width, rect.Height);
                     break;
                 case Placement.Top:
                     Orientation = Orientation.Horizontal;
                     ZeroPoint = ZeroPoint.Near;
                     Flip = true;
-                    Left = 0;
-                    Top = 0;
-                    Width = screen.WorkingAreaDip.Width;
+                    window.MoveWindow(rect.Left, rect.Top, rect.Width, Height);
                     break;
                 case Placement.Bottom:
                     Orientation = Orientation.Horizontal;
                     ZeroPoint = ZeroPoint.Near;
                     Flip = false;
-                    Left = 0;
-                    Top = screen.WorkingAreaDip.Height - window.ActualHeight;
-                    Width = screen.WorkingAreaDip.Width;
+                    window.MoveWindow(rect.Left, rect.Bottom - Height, rect.Width, Height);
                     break;
                 case Placement.MaximizedWidth:
-                    Left = 0;
-                    Width = screen.WorkingAreaDip.Width;
+                    Left = rect.Left;
+                    Width = rect.Width;
                     break;
                 case Placement.MaximizedHeight:
-                    Top = 0;
-                    Height = screen.WorkingAreaDip.Height;
+                    Top = rect.Top;
+                    Height = rect.Height;
                     break;
             }
+            window.ActivateWindow();
         }
 
 
         private void RulerViewModel_PropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
             // save current layout values before changing
-            if (e.PropertyName == nameof(Orientation))
+            if (e.PropertyName is nameof(Orientation))
             {
                 SaveCurrentLayout();
             }
