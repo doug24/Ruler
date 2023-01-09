@@ -48,14 +48,14 @@ namespace Ruler
 
         public static Point GetMousePosition(Window window)
         {
-            var pt = System.Windows.Forms.Control.MousePosition;
+            var pt = NativeMethods.MousePosition;
             var src = PresentationSource.FromVisual(window);
             if (src != null)
             {
                 var transform = src.CompositionTarget.TransformFromDevice;
-                return transform.Transform(new Point(pt.X, pt.Y));
+                return transform.Transform(pt);
             }
-            return new();
+            return pt;
         }
 
         private static double ToScaleX(Point screenPoint, Point clientPoint, Rect rect)

@@ -52,6 +52,19 @@ namespace Ruler
         [DllImport("user32.dll")]
         public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 
+        public static Point MousePosition
+        { 
+            get
+            {
+                POINT pt = new();
+                if (GetCursorPos(ref pt))
+                {
+                    return new(pt.X, pt.Y);
+                }
+                return new();
+            }
+        }
+
         #region Constants
 
         internal static readonly IntPtr HWND_TOPMOST = new(-1);
