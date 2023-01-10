@@ -213,7 +213,7 @@ namespace Ruler
             {
                 num = Math.Round(num, 2);
             }
-            else if (ScaleUnits == Units.Percent)
+            else
             {
                 num = Math.Round(num, 1);
             }
@@ -230,7 +230,7 @@ namespace Ruler
             {
                 num = Math.Round(num, 2);
             }
-            else if (ScaleUnits == Units.Percent)
+            else
             {
                 num = Math.Round(num, 1);
             }

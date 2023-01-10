@@ -33,6 +33,26 @@ namespace Ruler
             DependencyProperty.Register("MousePoint", typeof(Point), typeof(Angle),
             new FrameworkPropertyMetadata(new Point(), FrameworkPropertyMetadataOptions.AffectsRender));
 
+        public double RulerWidth
+        {
+            get { return (double)GetValue(RulerWidthProperty); }
+            set { SetValue(RulerWidthProperty, value); }
+        }
+
+        public static readonly DependencyProperty RulerWidthProperty =
+            DependencyProperty.Register("RulerWidth", typeof(double), typeof(Measure),
+            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public double RulerHeight
+        {
+            get { return (double)GetValue(RulerHeightProperty); }
+            set { SetValue(RulerHeightProperty, value); }
+        }
+
+        public static readonly DependencyProperty RulerHeightProperty =
+            DependencyProperty.Register("RulerHeight", typeof(double), typeof(Measure),
+            new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
+
         public bool Perpendicular
         {
             get { return (bool)GetValue(PerpendicularProperty); }
@@ -91,12 +111,14 @@ namespace Ruler
             dc.DrawCircularArc(null, linePen, originClient, radius,
                 startDegrees, sweepDegrees, sweepDirection);
 
-            // this keeps the mouse point 'within' the control and
-            // not click through to other windows
-            dc.DrawRectangle(transparentBrush, null, new(mouseClient.X - 16, mouseClient.Y - 16, 32, 32));
-
-            // hypotenuse
-            dc.DrawLine(linePen, originClient, mouseClient);
+            Rect rulerRect = new(originClient, new Size(RulerWidth, RulerHeight));
+            rulerRect.Inflate(-1, -1);
+            if (!rulerRect.Contains(mouseClient))
+            {
+                // this keeps the mouse point 'within' the control and
+                // not click through to other windows
+                dc.DrawRectangle(transparentBrush, null, new(mouseClient.X - 16, mouseClient.Y - 16, 32, 32));
+            }
 
             if (Perpendicular)
             {
@@ -108,14 +130,24 @@ namespace Ruler
                 double offset = Orientation == Orientation.Horizontal ? trackClient.Y : trackClient.X;
                 double offsetInUnits = DipConverter.Convert(offset, ScaleUnits, Orientation);
                 var offsetMarker = FormatText(offsetInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Mouse);
-                Point markerPoint = Orientation == Orientation.Horizontal ?
-                    new(mouseClient.X + 6, (mouseClient.Y + originClient.Y) / 2) :
-                    new((mouseClient.X + originClient.X) / 2, mouseClient.Y + 6);
+                Point markerPoint = GetPerpendicularTextLocation(offsetMarker, mouseClient, originClient);
                 Rect offsetRect = new(markerPoint, new Size(offsetMarker.Width, offsetMarker.Height));
                 offsetRect.Inflate(2, 2);
                 dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, null, offsetRect, 2, 2);
                 dc.DrawText(offsetMarker, markerPoint);
             }
+
+            // hypotenuse
+            dc.DrawLine(linePen, originClient, mouseClient);
+
+            double hyp = Math.Sqrt(dx * dx + dy * dy);
+            double hypInUnits = DipConverter.Convert(hyp, ScaleUnits, Orientation);
+            var hypText = FormatText(hypInUnits, MarkerFontSize, RulerSettings.CurrentTheme.Foreground);
+            Point hypPoint = GetHypotenuseTextLocation(hypText, mouseClient, trackClient);
+            Rect hypTextRect = new(hypPoint, new Size(hypText.Width, hypText.Height));
+            hypTextRect.Inflate(4, 4);
+            dc.DrawRoundedRectangle(RulerSettings.CurrentTheme.Info, foregroundPen, hypTextRect, 4, 4);
+            dc.DrawText(hypText, hypPoint);
 
             // angle text
             Rect textRect = new(textOriginClient, new Size(label.Width, label.Height));
@@ -262,11 +294,80 @@ namespace Ruler
                 }
             }
 
-            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0), 
+            label = FormatText(sweepDegrees.ToString("f2") + char.ConvertFromUtf32(0x00B0),
                 MarkerFontSize, RulerSettings.CurrentTheme.Foreground);
             textOrigin = DrawingExtensions.GetEndPointOnRadus(Origin, radius + 12,
                 startDegrees, sweepDegrees / 2, sweepDirection);
             textOrigin.Offset(textOffset ? -label.Width : 0, -label.Height / 2);
+        }
+
+        private Point GetPerpendicularTextLocation(FormattedText text, Point mouseClient, Point originClient)
+        {
+            Point pt;
+            if (Orientation == Orientation.Horizontal)
+            {
+                pt = new(mouseClient.X + 6, (mouseClient.Y + originClient.Y) / 2);
+            }
+            else
+            {
+                pt = new((mouseClient.X + originClient.X) / 2, mouseClient.Y + 6);
+            }
+
+            return ConstraintToClient(text, pt);
+        }
+
+        private Point GetHypotenuseTextLocation(FormattedText text, Point mouseClient, Point trackClient)
+        {
+            Point pt;
+            if (Orientation == Orientation.Horizontal)
+            {
+                pt = mouseClient;
+                if (ZeroPoint == ZeroPoint.Near)
+                {
+                    pt.Offset(16, 0);
+                }
+                else
+                {
+                    pt.Offset(-text.Width - 16, 0);
+                }
+            }
+            else
+            {
+                pt = mouseClient;
+                if (trackClient.X > text.Width)
+                {
+                    pt.Offset(16, 12);
+                }
+                else
+                {
+                    pt.Offset(-text.Width - 8, 12);
+                }
+            }
+
+            return ConstraintToClient(text, pt);
+        }
+
+        private Point ConstraintToClient(FormattedText text, Point pt)
+        {
+            if (pt.X < 4)
+            {
+                pt.X = 4;
+            }
+            else if (pt.X + text.Width > ActualWidth - 4)
+            {
+                pt.X = ActualWidth - text.Width - 4;
+            }
+
+            if (pt.Y < 4)
+            {
+                pt.Y = 4;
+            }
+            if (pt.Y + text.Height > ActualHeight - 4)
+            {
+                pt.Y = ActualHeight - text.Height - 4;
+            }
+
+            return pt;
         }
     }
 }

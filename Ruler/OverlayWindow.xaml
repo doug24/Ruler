@@ -24,5 +24,7 @@
                  Perpendicular="{Binding Perpendicular}"
                  Orientation="{Binding Orientation}"
                  ScaleUnits="{Binding ScaleUnits}" 
-                 ZeroPoint="{Binding ZeroPoint}"/>
+                 ZeroPoint="{Binding ZeroPoint}"
+                 RulerWidth="{Binding Width}"
+                 RulerHeight="{Binding Height}"/>
 </Window>
