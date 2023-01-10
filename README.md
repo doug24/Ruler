@@ -18,7 +18,7 @@ A Windows screen ruler with angle measurement and magnifier.
   - Inch
   - Percent of screen size
 - Horizontal or Vertical orientation 
-- Change the zero point
+- Change the zero point end to end
 - Change the scale side
 - Dock the ruler to screen edges
 - Change color themes
