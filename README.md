@@ -24,6 +24,8 @@ A Windows screen ruler with angle measurement and magnifier.
 - Change color themes
 - Make fine adjustments to ruler position and length and mouse position from the keyboard
 
+User configuration is saved using [Config.Net](https://github.com/aloneguid/config).
+
 <img src="Docs/capture-000178.png" width="760"/>
 
 Angle measure shows angle, hypotenuse, horizontal and verical offsets 
