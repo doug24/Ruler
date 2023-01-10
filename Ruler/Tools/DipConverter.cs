@@ -136,46 +136,5 @@ namespace Ruler
                 .CompositionTarget.TransformToDevice.M22;
         }
 
-        //internal static double ToMin(double size, double stepSize, ZeroPoint zeroPoint, Units scaleUnits, Orientation orientation)
-        //{
-        //    if (zeroPoint == ZeroPoint.Near)
-        //    {
-        //        return 0;
-        //    }
-
-        //    double unitsSize = Convert(size, scaleUnits, orientation);
-
-        //    if (zeroPoint == ZeroPoint.Middle)
-        //    {
-        //        unitsSize /= 2d;
-        //    }
-
-        //    double int_closest_to_ratio = Math.Round(unitsSize / stepSize);
-        //    double residue = unitsSize - int_closest_to_ratio * stepSize;
-
-        //    unitsSize -= residue;
-        //    return -1 * unitsSize;
-        //}
-
-        //internal static double ToMax(double size, double stepSize, ZeroPoint zeroPoint, Units scaleUnits, Orientation orientation)
-        //{
-        //    if (zeroPoint == ZeroPoint.Far)
-        //    {
-        //        return 0;
-        //    }
-
-        //    double unitsSize = Convert(size, scaleUnits, orientation);
-
-        //    if (zeroPoint == ZeroPoint.Middle)
-        //    {
-        //        unitsSize /= 2d;
-        //    }
-
-        //    double int_closest_to_ratio = Math.Round(unitsSize / stepSize);
-        //    double residue = unitsSize - int_closest_to_ratio * stepSize;
-
-        //    unitsSize -= residue;
-        //    return unitsSize;
-        //}
     }
 }

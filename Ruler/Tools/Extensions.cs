@@ -16,8 +16,7 @@ namespace Ruler
             //Check if this is the end of the tree
             if (parent == null) return null;
 
-            Window? parentWindow = parent as Window;
-            if (parentWindow != null)
+            if (parent is Window parentWindow)
             {
                 return parentWindow;
             }
@@ -35,8 +34,7 @@ namespace Ruler
             //Check if this is the end of the tree
             if (parent == null) return null;
 
-            FrameworkElement? parentElement = parent as FrameworkElement;
-            if (parentElement != null)
+            if (parent is FrameworkElement parentElement)
             {
                 return parentElement;
             }

@@ -20,7 +20,7 @@ namespace Ruler
         private OverlayWindow? angleWindow;
         private MagnifierWindow? magnifierWindow;
         private double minDip = 1d;
-        private double windowSizeEpsilon;
+        private readonly double windowSizeEpsilon;
 
         public MainWindow()
         {
