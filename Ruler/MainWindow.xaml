@@ -10,8 +10,6 @@
         Icon="/ruler;component/images/ruler.ico"
         Topmost="{Binding TopMost}"
         WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
         WindowStartupLocation="Manual"
         Left="{Binding Left, Mode=TwoWay}"
         Top="{Binding Top, Mode=TwoWay}"
