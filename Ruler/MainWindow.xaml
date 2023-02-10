@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:Ruler"
         mc:Ignorable="d"
         x:Name="mainWindow"
+        AllowsTransparency="True"
+        Background="Transparent"
         Title="Ruler"
         Icon="/ruler;component/images/ruler.ico"
         Topmost="{Binding TopMost}"
