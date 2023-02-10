@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Interop;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.HiDpi;
 
 namespace Ruler
 {
@@ -9,34 +13,34 @@ namespace Ruler
     {
         private readonly IntPtr hMonitor;
 
-        private Screen(IntPtr monitor)
+        private Screen(HMONITOR monitor)
         {
             var info = new NativeMethods.MONITORINFOEX();
             NativeMethods.GetMonitorInfo(monitor, info);
 
-            _ = NativeMethods.GetDpiForMonitor(monitor, NativeMethods.MonitorDpiType.MDT_EFFECTIVE_DPI, out uint dpiX, out uint dpiY);
+            _ = PInvoke.GetDpiForMonitor(monitor, dpiType: MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, out uint dpiX, out uint dpiY);
             ScaleX = dpiX / 96.0;
             ScaleY = dpiY / 96.0;
 
             BoundsPix = new Rect(
-                info.rcMonitor.Left, info.rcMonitor.Top,
-                info.rcMonitor.Right - info.rcMonitor.Left,
-                info.rcMonitor.Bottom - info.rcMonitor.Top);
+                info.rcMonitor.left, info.rcMonitor.top,
+                info.rcMonitor.right - info.rcMonitor.left,
+                info.rcMonitor.bottom - info.rcMonitor.top);
 
             BoundsDip = new(
                 BoundsPix.Left / ScaleX, BoundsPix.Top / ScaleY,
                 BoundsPix.Width / ScaleX, BoundsPix.Height / ScaleY);
 
             WorkingAreaPix = new Rect(
-                info.rcWork.Left, info.rcWork.Top,
-                info.rcWork.Right - info.rcWork.Left,
-                info.rcWork.Bottom - info.rcWork.Top);
+                info.rcWork.left, info.rcWork.top,
+                info.rcWork.right - info.rcWork.left,
+                info.rcWork.bottom - info.rcWork.top);
 
             WorkingAreaDip = new(
                 WorkingAreaPix.Left / ScaleX, WorkingAreaPix.Top / ScaleY,
                 WorkingAreaPix.Width / ScaleX, WorkingAreaPix.Height / ScaleY);
 
-            Primary = (info.dwFlags & NativeMethods.MONITOR_DEFAULTTOPRIMARY) != 0;
+            Primary = (info.dwFlags & (uint)MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY) != 0;
 
             DeviceName = new string(info.szDevice).TrimEnd((char)0);
 
@@ -76,29 +80,29 @@ namespace Ruler
 
         internal static Screen FromHandle(IntPtr handle)
         {
-            return new Screen(NativeMethods.MonitorFromWindow(handle, NativeMethods.MONITOR_DEFAULTTONEAREST));
+            return new Screen(PInvoke.MonitorFromWindow(new(handle), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST));
         }
 
         public static Screen FromPoint(Point point)
         {
-            return new(NativeMethods.GetMonitor(point));
+            return new(PInvoke.MonitorFromPoint(new((int)point.X, (int)point.Y), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST));
         }
 
         public static Screen FromWindow(Window window)
         {
-            return new Screen(NativeMethods.MonitorFromWindow(
-                new WindowInteropHelper(window).Handle,
-                NativeMethods.MONITOR_DEFAULTTONEAREST));
+            return new Screen(PInvoke.MonitorFromWindow(
+                new(new WindowInteropHelper(window).Handle),
+                MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST));
         }
 
-        public static IEnumerable<Screen> AllScreens
+        unsafe public static IEnumerable<Screen> AllScreens
         {
             get
             {
                 List<Screen> screens = new();
 
-                NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
-                    delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+                PInvoke.EnumDisplayMonitors(new HDC(), null,
+                    delegate (HMONITOR hMonitor, HDC hdcMonitor, RECT* lprcMonitor, LPARAM dwData)
                     {
                         screens.Add(new Screen(hMonitor));
                         return true;

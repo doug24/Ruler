@@ -1,0 +1,29 @@
+AttachThreadInput
+CreateWindowExW
+EnumDisplayMonitors
+GetCursorPos
+GetDpiForMonitor
+GetForegroundWindow
+GetModuleHandle
+GetWindowLong
+GetWindowThreadProcessId
+InvalidateRect
+MagInitialize
+MagSetWindowSource
+MagSetWindowTransform
+MagUninitialize
+MonitorFromPoint
+MonitorFromWindow
+MoveWindow
+SetCursorPos
+SetForegroundWindow
+SetWindowLong
+SetWindowPos
+
+HWND_TOPMOST
+WM_NCHITTEST
+HTTRANSPARENT
+
+// https://github.com/dotnet/wpf/issues/7106
+// command which unlock publish in VS is 
+// dotnet publish /bl -r win-x64 -c Release /p:PublishSingleFile=true --no-self-contained

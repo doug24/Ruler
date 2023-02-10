@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Windows.Win32;
 
 namespace Ruler
 {
@@ -101,29 +102,29 @@ namespace Ruler
         {
             IntPtr hWnd = new WindowInteropHelper(window).Handle;
             var matrix = PresentationSource.FromVisual(window).CompositionTarget.TransformToDevice;
-            return NativeMethods.MoveWindow(hWnd, (int)(left * matrix.M11), (int)(top * matrix.M22), (int)(width * matrix.M11), (int)(height * matrix.M22), true) != 0;
+            return PInvoke.MoveWindow(new(hWnd), (int)(left * matrix.M11), (int)(top * matrix.M22), (int)(width * matrix.M11), (int)(height * matrix.M22), true) != 0;
         }
 
         // Based on Rick Strahl's blog:
         // https://weblog.west-wind.com/posts/2020/Oct/12/Window-Activation-Headaches-in-WPF
-        public static void ActivateWindow(this Window window)
+        unsafe public static void ActivateWindow(this Window window)
         {
             window.Dispatcher.InvokeAsync(() =>
             {
                 var hwnd = new WindowInteropHelper(window).Handle;
 
-                var threadId1 = NativeMethods.GetWindowThreadProcessId(NativeMethods.GetForegroundWindow(), IntPtr.Zero);
-                var threadId2 = NativeMethods.GetWindowThreadProcessId(hwnd, IntPtr.Zero);
+                var threadId1 = PInvoke.GetWindowThreadProcessId(PInvoke.GetForegroundWindow());
+                var threadId2 = PInvoke.GetWindowThreadProcessId(new(hwnd));
 
                 if (threadId1 != threadId2)
                 {
-                    NativeMethods.AttachThreadInput(threadId1, threadId2, true);
-                    NativeMethods.SetForegroundWindow(hwnd);
-                    NativeMethods.AttachThreadInput(threadId1, threadId2, false);
+                    PInvoke.AttachThreadInput(threadId1, threadId2, true);
+                    PInvoke.SetForegroundWindow(new(hwnd));
+                    PInvoke.AttachThreadInput(threadId1, threadId2, false);
                 }
                 else
                 {
-                    NativeMethods.SetForegroundWindow(hwnd);
+                    PInvoke.SetForegroundWindow(new(hwnd));
                 }
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }

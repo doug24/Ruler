@@ -5,7 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using static Ruler.NativeMethods;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Ruler
 {
@@ -331,10 +333,9 @@ namespace Ruler
 
         private static void MoveCursor(int xOffset, int yOffset)
         {
-            POINT mousePoint = new();
-            if (GetCursorPos(ref mousePoint))
+            if (PInvoke.GetCursorPos(out var mousePoint))
             {
-                SetCursorPos(mousePoint.X + xOffset, mousePoint.Y + yOffset);
+                PInvoke.SetCursorPos(mousePoint.X + xOffset, mousePoint.Y + yOffset);
             }
         }
 
@@ -381,9 +382,9 @@ namespace Ruler
         {
             if (sender is Window window)
             {
-                var hwnd = new WindowInteropHelper(window).Handle;
-                var value = GetWindowLong(hwnd, GWL_STYLE);
-                _ = SetWindowLong(hwnd, GWL_STYLE, value & ~WS_MAXIMIZEBOX);
+                HWND hWnd = new(new WindowInteropHelper(window).Handle);
+                var value = PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+                _ = PInvoke.SetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, value & ~(int)WINDOW_STYLE.WS_MAXIMIZEBOX);
             }
         }
 

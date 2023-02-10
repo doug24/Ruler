@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using static Ruler.NativeMethods;
+using Windows.Win32;
 
 namespace Ruler
 {
@@ -40,13 +40,13 @@ namespace Ruler
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == WM_NCHITTEST)
+            if (msg == PInvoke.WM_NCHITTEST)
             {
                 handled = true;
                 // In a window currently covered by another window in the same thread
                 // (the message will be sent to underlying windows in the same thread
                 // until one of them returns a code that is not HTTRANSPARENT).
-                return HTTRANSPARENT;
+                return new(PInvoke.HTTRANSPARENT);
             }
 
             return IntPtr.Zero;

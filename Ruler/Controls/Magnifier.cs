@@ -4,7 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using static Ruler.NativeMethods;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.Magnification;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Ruler
 {
@@ -59,7 +62,7 @@ namespace Ruler
                 hostWindow.SizeChanged += Window_SizeChanged;
                 hostWindow.Closing += Window_Closing;
 
-                MagInitialized = MagInitialize();
+                MagInitialized = PInvoke.MagInitialize();
                 if (MagInitialized)
                 {
                     CreateMagnifier();
@@ -91,23 +94,22 @@ namespace Ruler
             UpdateMaginifier();
         }
 
-        public virtual void UpdateMaginifier()
+        unsafe public virtual void UpdateMaginifier()
         {
             if (!MagInitialized || magnifierHandle == IntPtr.Zero)
                 return;
 
-            POINT mousePoint = new();
-            GetCursorPos(ref mousePoint);
+            PInvoke.GetCursorPos(out var mousePoint);
 
             var width = DipConverter.DipsToPixelsX(RenderSize.Width / Magnification);
             var height = DipConverter.DipsToPixelsY(RenderSize.Height / Magnification);
 
             RECT sourceRect = new()
             {
-                Left = mousePoint.X - (int)(width / 2),
-                Top = mousePoint.Y - (int)(height / 2),
-                Right = mousePoint.X + (int)(width / 2),
-                Bottom = mousePoint.Y + (int)(height / 2)
+                left = mousePoint.X - (int)(width / 2),
+                top = mousePoint.Y - (int)(height / 2),
+                right = mousePoint.X + (int)(width / 2),
+                bottom = mousePoint.Y + (int)(height / 2)
             };
 
             Screen screen = Screen.FromHandle(magnifierHandle);
@@ -118,36 +120,37 @@ namespace Ruler
             // the edges of the screen to view the edge pixels.
             // But what happens when crossing to another screen?
 
-            if (sourceRect.Left < bounds.Left)
+            if (sourceRect.left < bounds.Left)
             {
-                sourceRect.Left = (int)bounds.Left;
+                sourceRect.left = (int)bounds.Left;
             }
-            if (sourceRect.Left > bounds.Right - width)
+            if (sourceRect.left > bounds.Right - width)
             {
-                sourceRect.Left = (int)(bounds.Right - width);
+                sourceRect.left = (int)(bounds.Right - width);
             }
-            sourceRect.Right = sourceRect.Left + (int)width;
+            sourceRect.right = sourceRect.left + (int)width;
 
-            if (sourceRect.Top < bounds.Top)
+            if (sourceRect.top < bounds.Top)
             {
-                sourceRect.Top = (int)bounds.Top;
+                sourceRect.top = (int)bounds.Top;
             }
-            if (sourceRect.Top > bounds.Height - height)
+            if (sourceRect.top > bounds.Height - height)
             {
-                sourceRect.Top = (int)(bounds.Height - height);
+                sourceRect.top = (int)(bounds.Height - height);
             }
-            sourceRect.Bottom = sourceRect.Top + (int)height;
+            sourceRect.bottom = sourceRect.top + (int)height;
 
             // Set the source rectangle for the magnifier control.
-            MagSetWindowSource(magnifierHandle, sourceRect);
+            //MagSetWindowSource(magnifierHandle, sourceRect);
+            PInvoke.MagSetWindowSource(new(magnifierHandle), sourceRect);
 
             // Reclaim topmost status, to prevent unmagnified menus from remaining in view. 
-            IntPtr hWndHost = new WindowInteropHelper(hostWindow).Handle;
-            SetWindowPos(hWndHost, HWND_TOPMOST, 0, 0, 0, 0,
-                SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+            HWND hWnd = new(new WindowInteropHelper(hostWindow).Handle);
+            PInvoke.SetWindowPos(hWnd, HWND.HWND_TOPMOST, 0, 0, 0, 0,
+                SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE);
 
             // Force redraw.
-            InvalidateRect(magnifierHandle, IntPtr.Zero, true);
+            PInvoke.InvalidateRect(new(magnifierHandle), bErase: true);
         }
 
         private void ResizeMagnifier()
@@ -161,17 +164,18 @@ namespace Ruler
             // dips to pixels
             bounds.Transform(PresentationSource.FromVisual(parent).CompositionTarget.TransformToDevice);
 
-            SetWindowPos(magnifierHandle, IntPtr.Zero,
+            PInvoke.SetWindowPos(new(magnifierHandle), new(IntPtr.Zero),
                 (int)bounds.Left, (int)bounds.Top, (int)bounds.Width, (int)bounds.Height, 0);
         }
 
-        private void CreateMagnifier()
+        unsafe private void CreateMagnifier()
         {
             if (!MagInitialized)
                 return;
 
-            IntPtr hInst = GetModuleHandle(null);
-            IntPtr hWndHost = new WindowInteropHelper(hostWindow).Handle;
+            var hInst = PInvoke.GetModuleHandle(string.Empty);
+            var hMenu = new FreeLibrarySafeHandle();
+            var hWndHost = new WindowInteropHelper(hostWindow).Handle;
 
             Window parent = Window.GetWindow(this);
             // get the magnifier bounds relative to the parent window
@@ -180,10 +184,10 @@ namespace Ruler
             bounds.Transform(PresentationSource.FromVisual(parent).CompositionTarget.TransformToDevice);
 
             // Create a magnifier control that fits the client area
-            magnifierHandle = CreateWindow(0, "Magnifier", "MagnifierWindow",
+            magnifierHandle = PInvoke.CreateWindowEx(0, "Magnifier", "MagnifierWindow",
                 //WS_CHILD | WS_VISIBLE, (int)Margin.Left + 1, (int)Margin.Top + 1, width, height,
-                WS_CHILD | WS_VISIBLE, (int)bounds.Left, (int)bounds.Top, (int)bounds.Width, (int)bounds.Height,
-                hWndHost, IntPtr.Zero, hInst, IntPtr.Zero);
+                WINDOW_STYLE.WS_CHILD | WINDOW_STYLE.WS_VISIBLE, (int)bounds.Left, (int)bounds.Top, (int)bounds.Width, (int)bounds.Height,
+                new(hWndHost), hMenu, hInst, null);
 
             if (magnifierHandle == IntPtr.Zero)
             {
@@ -193,11 +197,20 @@ namespace Ruler
             SetMagnificationTransform();
         }
 
-        private void SetMagnificationTransform()
+        unsafe private void SetMagnificationTransform()
         {
             // Set the magnification factor.
-            Transformation matrix = new(Magnification);
-            MagSetWindowTransform(magnifierHandle, ref matrix);
+            var n = Magnification;
+            // Set the magnification factor.
+            MAGTRANSFORM matrix = new();
+            matrix.v.Value[0] = n;
+            matrix.v.Value[4] = n;
+            matrix.v.Value[8] = 1f;
+
+            PInvoke.MagSetWindowTransform(new(magnifierHandle), ref matrix);
+
+            //Transformation matrix = new(Magnification);
+            //MagSetWindowTransform(magnifierHandle, ref matrix);
         }
 
         #region IDisposable Members
@@ -222,7 +235,7 @@ namespace Ruler
             }
             if (MagInitialized)
             {
-                MagUninitialize();
+                PInvoke.MagUninitialize();
             }
         }
 

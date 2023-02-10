@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Windows.Win32;
 
 namespace Ruler
 {
@@ -48,7 +49,8 @@ namespace Ruler
 
         public static Point GetMousePosition(Window window)
         {
-            var pt = NativeMethods.MousePosition;
+            PInvoke.GetCursorPos(out var mousePoint);
+            Point pt = new(mousePoint.X, mousePoint.Y);
             var src = PresentationSource.FromVisual(window);
             if (src != null)
             {
