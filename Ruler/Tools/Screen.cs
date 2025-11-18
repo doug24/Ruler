@@ -99,7 +99,7 @@ namespace Ruler
         {
             get
             {
-                List<Screen> screens = new();
+                List<Screen> screens = [];
 
                 PInvoke.EnumDisplayMonitors(new HDC(), (RECT?)null,
                     delegate (HMONITOR hMonitor, HDC hdcMonitor, RECT* lprcMonitor, LPARAM dwData)

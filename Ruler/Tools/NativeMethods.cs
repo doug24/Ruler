@@ -10,7 +10,7 @@ namespace Ruler
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
         internal class MONITORINFOEX
         {
-            internal uint cbSize = (uint)Marshal.SizeOf(typeof(MONITORINFOEX));
+            internal uint cbSize = (uint)Marshal.SizeOf<MONITORINFOEX>();
             internal RECT rcMonitor = new();
             internal RECT rcWork = new();
             internal uint dwFlags = 0;
